@@ -16,6 +16,7 @@ import os
 import csv
 import simplepng
 from collections import defaultdict
+import itertools
 from xml import sax
 
 def read_layer(filename):
@@ -78,7 +79,7 @@ class RegistryHandler(sax.ContentHandler):
         "name": name,
         "x": int(float(attrs["x"])),
         "y": int(float(attrs["y"])),
-        "frame": attrs["frame"],
+        "frame": int(attrs["frame"]),
         "type": attrs.get("type", None),
       })
   def endElement(self, name):
@@ -221,9 +222,316 @@ mapfiles = [
   }
 ]
 
-entities = {
-  "Treasure": { "image": "Anodyne/src/entity/gadget/Treasure_S_TREASURE_SPRITE.png", "tile_index": 1}
+sprite_paths = {
+  "Slime": "Anodyne/src/entity/enemy/bedroom/Slime_Slime_Sprite.png",
+  "SinglePushBlock": "Anodyne/src/entity/gadget/SinglePushBlock_C_PUSH_BLOCKS.png",
+  "Door": [
+    "Anodyne/src/entity/gadget/Door_embed_nexus_cardgem.png",
+    "Anodyne/src/entity/gadget/Door_Nexus_door_overlay_embed.png",
+    "Anodyne/src/entity/gadget/Door_Sprite_nexus_door.png",
+    "Anodyne/src/entity/gadget/Door_White_Portal_Sprite.png",
+    "Anodyne/src/entity/gadget/Door_Door_Sprites.png",
+    "Anodyne/src/entity/gadget/Door_Nexus_door_previews_embed.png",
+    "Anodyne/src/entity/gadget/Door_Whirlpool_Door_Sprite.png",
+  ],
+  "Wall_Laser": "???",
+  "Eye_Light": "Anodyne/src/entity/decoration/Eye_Light_Eye_Light_Sprite.png",
+  "Mover": "Anodyne/src/entity/enemy/redcave/Mover_mover_sprite.png",
+  "KeyBlock": "Anodyne/src/entity/gadget/KeyBlock_C_KEYBLOCK_SPRITE.png",
+  "Hole": "Anodyne/src/entity/gadget/Hole_C_HOLE_SPRITE.png",
+  "Gate": "Anodyne/src/entity/gadget/Gate_C_GATE_SPRITES.png",
+  "Treasure": "Anodyne/src/entity/gadget/Treasure_S_TREASURE_SPRITE.png",
+  "CrackedTile": "Anodyne/src/entity/gadget/CrackedTile_C_CRACKED_TILES.png",
+  "Button": "Anodyne/src/entity/gadget/Button_S_BUTTON.png",
+  "Sun_Guy": [
+    "Anodyne/src/entity/enemy/bedroom/Sun_Guy_C_SUN_GUY.png",
+    "Anodyne/src/entity/enemy/bedroom/Sun_Guy_C_SUN_GUY_WAVE.png",
+    "Anodyne/src/entity/enemy/bedroom/Sun_Guy_C_LIGHT_ORB.png",
+  ],
+  "Dust": "Anodyne/src/entity/gadget/Dust_DUST_SPRITE.png",
+  "Shieldy": "Anodyne/src/entity/enemy/bedroom/Shieldy_SPRITE_SHIELDY.png",
+  "Pew_Laser": [
+    "Anodyne/src/entity/enemy/bedroom/Pew_Laser_PEW_LASER_BULLET.png",
+    "Anodyne/src/entity/enemy/bedroom/Pew_Laser_PEW_LASER.png",
+  ],
+  "Annoyer": "Anodyne/src/entity/enemy/bedroom/Annoyer_S_ANNOYER_SPRITE.png",
+  "Console": [
+    "Anodyne/src/entity/gadget/Console_embed_windmill_inside.png",
+    "Anodyne/src/entity/gadget/Console_sprite_console.png",
+  ],
+  "Follower_Bro": "Anodyne/src/entity/enemy/etc/Follower_Bro_sprite_follower.png",
+  "Sadbro": "Anodyne/src/entity/enemy/etc/Sadbro_sadman_sprite.png",
+  "Red_Walker": "Anodyne/src/entity/enemy/etc/Red_Walker_sprite_redwalker.png",
+  "Four_Shooter": [
+    "Anodyne/src/entity/enemy/redcave/Four_Shooter_four_shooter_bullet_sprite.png",
+    "Anodyne/src/entity/enemy/redcave/Four_Shooter_four_shooter_sprite.png",
+  ],
+  "Slasher": "Anodyne/src/entity/enemy/redcave/Slasher_slasher_sprite.png",
+  "On_Off_Laser": [
+    "Anodyne/src/entity/enemy/redcave/On_Off_Laser_v_on_off_sprite.png",
+    "Anodyne/src/entity/enemy/redcave/On_Off_Laser_h_on_off_sprite.png",
+    "Anodyne/src/entity/enemy/redcave/On_Off_Laser_on_off_shooter_sprite.png",
+  ],
+  "Red_Pillar": [
+    "Anodyne/src/entity/interactive/Red_Pillar_red_pillar_ripple_sprite.png",
+    "Anodyne/src/entity/interactive/Red_Pillar_red_pillar_sprite.png",
+  ],
+  "Solid_Sprite": [
+    "Anodyne/src/entity/decoration/Solid_Sprite_red_cave_left_sprite.png",
+    "Anodyne/src/entity/decoration/Solid_Sprite_trees_sprites.png",
+  ],
+  "Big_Door": "Anodyne/src/entity/gadget/Big_Door_big_door_sprite.png",
+  "Fisherman": "???",
+  "Jump_Trigger": "Anodyne/src/entity/gadget/Jump_Trigger_spring_pad_sprite.png",
+  "NPC": [
+    "Anodyne/src/entity/interactive/NPC_key_sparkle_embed.png",
+    "Anodyne/src/entity/interactive/NPC_embed_trade_npcs.png",
+    "Anodyne/src/entity/interactive/NPC_embed_hotel_npcs.png",
+    "Anodyne/src/entity/interactive/NPC_embed_cube_kings.png",
+    "Anodyne/src/entity/interactive/NPC_embed_cell_bodies.png",
+    "Anodyne/src/entity/interactive/NPC_embed_geoms.png",
+    "Anodyne/src/entity/interactive/NPC_embed_beach_npcs.png",
+    "Anodyne/src/entity/interactive/NPC_embed_cliff_npcs.png",
+    "Anodyne/src/entity/interactive/NPC_embed_nexus_pad.png",
+    "Anodyne/src/entity/interactive/NPC_embed_windmill_blade.png",
+    "Anodyne/src/entity/interactive/NPC_embed_randoms.png",
+    "Anodyne/src/entity/interactive/NPC_sage_statue.png",
+    "Anodyne/src/entity/interactive/NPC_embed_windmill_shell.png",
+    "Anodyne/src/entity/interactive/NPC_key_green_embed.png",
+    "Anodyne/src/entity/interactive/NPC_note_rock.png",
+    "Anodyne/src/entity/interactive/NPC_npc_biofilm.png",
+    "Anodyne/src/entity/interactive/NPC_embed_smoke_red.png",
+    "Anodyne/src/entity/interactive/NPC_embed_blue_npcs.png",
+    "Anodyne/src/entity/interactive/NPC_npc_spritesheet.png",
+  ],
+  "Red_Boss": [
+    "Anodyne/src/entity/enemy/redcave/Red_Boss_red_boss_sprite.png",
+    "Anodyne/src/entity/enemy/redcave/Red_Boss_ripple_sprite.png",
+    "Anodyne/src/entity/enemy/redcave/Red_Boss_big_wave_sprite.png",
+    "Anodyne/src/entity/enemy/redcave/Red_Boss_bullet_sprite.png",
+    "Anodyne/src/entity/enemy/redcave/Red_Boss_tentacle_sprite.png",
+    "Anodyne/src/entity/enemy/redcave/Red_Boss_red_boss_alternate_sprite.png",
+    "Anodyne/src/entity/enemy/redcave/Red_Boss_small_wave_sprite.png",
+    "Anodyne/src/entity/enemy/redcave/Red_Boss_warning_sprite.png",
+  ],
+  "Propelled": "Anodyne/src/entity/gadget/Propelled_moving_platform_sprite.png",
+  "Stop_Marker": "???",
+  "Person": "Anodyne/src/entity/enemy/crowd/Person_person_sprite.png",
+  "Rotator": "Anodyne/src/entity/enemy/crowd/Rotator_rotator_sprite.png",
+  "Frog": "Anodyne/src/entity/enemy/crowd/Frog_frog_sprite.png",
+  "Spike_Roller": [
+    "Anodyne/src/entity/enemy/crowd/Spike_Roller_Spike_Roller_Sprite_H.png",
+    "Anodyne/src/entity/enemy/crowd/Spike_Roller_vert_shadow_sprite.png",
+    "Anodyne/src/entity/enemy/crowd/Spike_Roller_hori_shadow_sprite.png",
+    "Anodyne/src/entity/enemy/crowd/Spike_Roller_Spike_Roller_Sprite.png",
+  ],
+  "Dog": "Anodyne/src/entity/enemy/crowd/Dog_dog_sprite.png",
+  "WallBoss": [
+    "Anodyne/src/entity/enemy/crowd/WallBoss_wall_sprite.png",
+    "Anodyne/src/entity/enemy/crowd/WallBoss_bullet_sprite.png",
+    "Anodyne/src/entity/enemy/crowd/WallBoss_l_hand_sprite.png",
+    "Anodyne/src/entity/enemy/crowd/WallBoss_r_hand_sprite.png",
+    "Anodyne/src/entity/enemy/crowd/WallBoss_face_sprite.png",
+    "Anodyne/src/entity/enemy/crowd/WallBoss_laser_sprite.png",
+  ],
+  "Pillar_Switch": "Anodyne/src/entity/gadget/Pillar_Switch_pillar_switch_sprite.png",
+  "Switch_Pillar": "Anodyne/src/entity/gadget/Switch_Pillar_switch_pillar_sprite.png",
+  "Silverfish": "Anodyne/src/entity/enemy/apartment/Silverfish_silverfish_sprite.png",
+  "Rat": "Anodyne/src/entity/enemy/apartment/Rat_rat_sprite.png",
+  "Teleguy": "Anodyne/src/entity/enemy/apartment/Teleguy_teleguy_sprite.png",
+  "Dash_Trap": "Anodyne/src/entity/enemy/apartment/Dash_Trap_dash_trap_sprite.png",
+  "Gasguy": "Anodyne/src/entity/enemy/apartment/Gasguy_gas_guy_sprite.png",
+  "Terminal_Gate": "???",
+  "Dustmaid": "Anodyne/src/entity/enemy/hotel/Dustmaid_dustmaid_sprite.png",
+  "Splitboss": "Anodyne/src/entity/enemy/apartment/Splitboss_splitboss_sprite.png",
+  "Nonsolid": [
+    "Anodyne/src/entity/decoration/Nonsolid_grass_REDSEA_sprite.png",
+    "Anodyne/src/entity/decoration/Nonsolid_rail_sprite.png",
+    "Anodyne/src/entity/decoration/Nonsolid_rail_CROWD_sprite.png",
+    "Anodyne/src/entity/decoration/Nonsolid_rail_NEXUS_sprite.png",
+    "Anodyne/src/entity/decoration/Nonsolid_grass_1_sprite.png",
+  ],
+  "Steam_Pipe": [
+    "Anodyne/src/entity/enemy/hotel/Steam_Pipe_steam_sprite.png",
+    "Anodyne/src/entity/enemy/hotel/Steam_Pipe_steam_pipe_sprite.png",
+  ],
+  "Burst_Plant": [
+    "Anodyne/src/entity/enemy/hotel/Burst_Plant_burst_plant_bullet_sprite.png",
+    "Anodyne/src/entity/enemy/hotel/Burst_Plant_burst_plant_sprite.png",
+  ],
+  "Dash_Pad": "Anodyne/src/entity/gadget/Dash_Pad_dash_pad_sprite.png",
+  "Elevator": "Anodyne/src/entity/interactive/Elevator_Elevator_Sprite.png",
+  "Eye_Boss": [
+    "Anodyne/src/entity/enemy/hotel/Eye_Boss_eye_boss_water_sprite.png",
+    "Anodyne/src/entity/enemy/hotel/Eye_Boss_eye_boss_bullet_sprite.png",
+    "Anodyne/src/entity/enemy/hotel/Eye_Boss_eye_boss_splash_sprite.png",
+  ],
+  "HealthPickup": [
+    "Anodyne/src/entity/player/HealthPickup_embed_Big_health.png",
+    "Anodyne/src/entity/player/HealthPickup_S_SMALL_HEALTH.png",
+  ],
+  "Contort": [
+    "Anodyne/src/entity/enemy/circus/Contort_contort_small_sprite.png",
+    "Anodyne/src/entity/enemy/circus/Contort_contort_big_sprite.png",
+  ],
+  "Lion": [
+    "Anodyne/src/entity/enemy/circus/Lion_lion_sprite.png",
+    "Anodyne/src/entity/enemy/circus/Lion_lion_fireball_sprite.png",
+  ],
+  "Circus_Folks": [
+    "Anodyne/src/entity/enemy/circus/Circus_Folks_javiera_juggle_sprite.png",
+    "Anodyne/src/entity/enemy/circus/Circus_Folks_both_sprite.png",
+    "Anodyne/src/entity/enemy/circus/Circus_Folks_shockwave_sprite.png",
+    "Anodyne/src/entity/enemy/circus/Circus_Folks_javiera_sprite.png",
+    "Anodyne/src/entity/enemy/circus/Circus_Folks_arthur_sprite.png",
+  ],
+  "Fire_Pillar": [
+    "Anodyne/src/entity/enemy/circus/Fire_Pillar_fire_pillar_base_sprite.png",
+    "Anodyne/src/entity/enemy/circus/Fire_Pillar_fire_pillar_sprite.png",
+  ],
+  "Sage": "Anodyne/src/entity/interactive/npc/Sage_sage_sprite.png",
+  "Mitra": [
+    "Anodyne/src/entity/interactive/npc/Mitra_mitra_sprite.png",
+    "Anodyne/src/entity/interactive/npc/Mitra_bike_sprite.png",
+    "Anodyne/src/entity/interactive/npc/Mitra_mitra_on_bike_sprite.png",
+  ],
+  "Health_Cicada": "Anodyne/src/entity/interactive/Health_Cicada_health_cicada_embed.png",
+  "Dungeon_Statue": "Anodyne/src/entity/interactive/Dungeon_Statue_statue_bedroom_embed.png",
+  "Chaser": "Anodyne/src/entity/enemy/etc/Chaser_embed_chaser_sprite.png",
+  "Space_Face": "???",
+  "Water_Anim": "???",
+  "Go_Detector": "???",
+  "Sage_Boss": [
+    "Anodyne/src/entity/enemy/etc/Sage_Boss_embed_sage_attacks.png",
+    "Anodyne/src/entity/enemy/etc/Sage_Boss_embed_long_dust.png",
+    "Anodyne/src/entity/enemy/etc/Sage_Boss_embed_sage_boss.png",
+    "Anodyne/src/entity/enemy/etc/Sage_Boss_embed_sage_long_attacks.png",
+  ],
+  "Shadow_Briar": [
+    "Anodyne/src/entity/enemy/etc/Briar_Boss_embed_mist.png",
+    "Anodyne/src/entity/enemy/etc/Briar_Boss_embed_ground_thorn.png",
+    "Anodyne/src/entity/enemy/etc/Briar_Boss_embed_thorn_bullet.png",
+    "Anodyne/src/entity/enemy/etc/Briar_Boss_embed_happy_thorn.png",
+    "Anodyne/src/entity/enemy/etc/Briar_Boss_embed_ice_crystal.png",
+    "Anodyne/src/entity/enemy/etc/Briar_Boss_embed_body_thorn.png",
+    "Anodyne/src/entity/enemy/etc/Briar_Boss_embed_briar_core.png",
+    "Anodyne/src/entity/enemy/etc/Briar_Boss_embed_overhang.png",
+    "Anodyne/src/entity/enemy/etc/Briar_Boss_embed_ice_explosion.png",
+    "Anodyne/src/entity/enemy/etc/Briar_Boss_embed_dust_explosion.png",
+    "Anodyne/src/entity/enemy/etc/Briar_Boss_embed_blue_thorn.png",
+    "Anodyne/src/entity/enemy/etc/Briar_Boss_embed_fire_eye.png",
+  ],
+  "Trade_NPC": "Anodyne/src/entity/interactive/npc/Trade_NPC_embed_dame_trade_npc.png",
+  "Forest_NPC": "Anodyne/src/entity/interactive/npc/Forest_NPC_embed_forest_npcs.png",
+  "Redsea_NPC": "Anodyne/src/entity/interactive/npc/Redsea_NPC_embed_redsea_npcs.png",
+  "Happy_NPC": "Anodyne/src/entity/interactive/npc/Happy_NPC_embed_happy_npcs.png",
+  "Space_NPC": "Anodyne/src/entity/interactive/npc/Space_NPC_embed_space_npc.png",
+  "Huge_Fucking_Stag": "Anodyne/src/entity/interactive/npc/Huge_Fucking_Stag_embed_stag.png",
+  "Black_Thing": "???",
+  "Suburb_Walker": [
+    "Anodyne/src/entity/enemy/suburb/Suburb_Walker_embed_suburb_walker.png",
+    "Anodyne/src/entity/enemy/suburb/Suburb_Walker_embed_suburb_folk.png",
+    "Anodyne/src/entity/enemy/suburb/Suburb_Walker_embed_suburb_killer.png",
+  ],
 }
+sprites = {}
+nonsolid_rail_sprite = None
+def load_sprites():
+  for sprite_name in sprite_paths:
+    if type(sprite_paths[sprite_name]) == str and sprite_paths[sprite_name] != "???":
+      sprites[sprite_name] = read_tileset(sprite_paths[sprite_name])
+  global nonsolid_rail_sprite
+  nonsolid_rail_sprite = read_tileset("Anodyne/src/entity/decoration/Nonsolid_rail_sprite.png")
+
+warning_set = set()
+def render_entities(image, entities, map_name):
+  did_anything = False
+
+  # get all the Dust first, since it can go away to fule a Propelled
+  dust_entities  = [entity for entity in entities if entity["name"] == "Dust"]
+  other_entities = [entity for entity in entities if entity["name"] != "Dust"]
+
+  def consume_dust_at(x, y):
+    for i, dust in enumerate(dust_entities):
+      if dust["x"] == x and dust["y"] == y:
+        del dust_entities[i]
+        return True
+    return False
+
+  # chain lets us delete from dust_entities and then not iterate over them
+  for entity in itertools.chain(other_entities, dust_entities):
+    entity_name = entity["name"]
+    x = entity["x"]
+    y = entity["y"]
+    frame = entity["frame"]
+    sx = 0
+    sy = 0
+    width = 16
+    height = 16
+    sprite = sprites.get(entity_name, None)
+    if entity_name == "Switch_Pillar":
+      sx = frame * 16
+    elif entity_name == "Silverfish":
+      sy = 16
+      if frame == 0: # left
+        sx = 32
+        sy = 16
+        # TODO: horizontal flip
+      elif frame == 1: # down
+        sy = 16
+      elif frame == 2: # right
+        sx = 32
+        sy = 16
+      elif frame == 3: # up
+        sy = 32
+      else:
+        print("WARNING: what Silverfish direction is this: {}".format(frame))
+    elif entity_name == "Dash_Trap":
+      sy = 16
+    elif entity_name in ("Gasguy", "Teleguy"):
+      height = 24
+    elif entity_name == "Slasher":
+      width = 24
+      height = 24
+    elif entity_name == "Splitboss":
+      width = 24
+      height = 32
+    elif entity_name == "KeyBlock":
+      if frame == 0: # small key block
+        pass
+      else:
+        print("WARNING: ignoring KeyBlock frame: {}".format(frame))
+        continue
+    elif entity_name == "Nonsolid":
+      if entity["type"] == "Rail_1":
+        sprite = nonsolid_rail_sprite
+      else:
+        print("WARNING: what nonsolid type is this: {}".format(entity["type"]))
+    elif entity_name == "Jump_Trigger":
+      if map_name in ("APARTMENT", "CLIFF", "BEACH", "CROWD"):
+        # jump triggers are invisible in these maps
+        continue
+      elif map_name == "HOTEL":
+        if entity["type"] != "1":
+          # only type=1 is visible
+          continue
+    elif entity_name == "Propelled":
+      if (frame & 1) == 0:
+        sy = 16
+      if consume_dust_at(x, y):
+        sx = 16
+    elif entity_name in sprites:
+      if entity_name not in warning_set:
+        warning_set.add(entity_name)
+        print("default rendering sprite: {}".format(entity_name))
+    if sprite != None:
+      image.paste(sprite, sx=sx, sy=sy, dx=x, dy=y, width=width, height=height)
+      did_anything = True
+    else:
+      if entity_name not in warning_set:
+        warning_set.add(entity_name)
+        print("WARNING: ignoring entity: {}".format(entity_name))
+  return did_anything
 
 def main():
   import argparse
@@ -234,12 +542,11 @@ def main():
 
   # read registry XML file that contains entity information
   objects_by_map_name = read_registry()
-  treasure_tiles = read_tileset("Anodyne/src/entity/gadget/Treasure_S_TREASURE_SPRITE.png");
+  load_sprites()
 
   if not os.path.exists("maps"):
     os.makedirs("maps")
 
-  warning_set = set()
   for mapfile in mapfiles:
     map_name = mapfile["map_name"]
     if args.map_name and map_name not in args.map_name:
@@ -248,23 +555,10 @@ def main():
 
     # build initial map image
     layers = generate_map_image(mapfile)
-    # draw the supported entites on the maps
-    for entity in objects_by_map_name[map_name]:
-      entity_name = entity["name"]
-      x = entity["x"]
-      y = entity["y"]
-      width = 16
-      height = 16
-      if entity_name == "Treasure":
-        sprite = treasure_tiles
-      else:
-        if entity_name not in warning_set:
-          print("WARNING: ignoring entity: {}".format(entity_name))
-          warning_set.add(entity_name)
-        continue
-      if layers[2] == None:
-        layers[2] = simplepng.ImageBuffer(layers[0].width, layers[0].height)
-      layers[2].paste(sprite, sx=0, sy=0, dx=x, dy=y, width=width, height=height)
+    # draw the supported entities on the maps
+    entity_layer = simplepng.ImageBuffer(layers[0].width, layers[0].height)
+    if render_entities(entity_layer, objects_by_map_name[map_name], map_name):
+      layers[2] = entity_layer
 
     # save images
     file_name_base = "maps/" + map_name
