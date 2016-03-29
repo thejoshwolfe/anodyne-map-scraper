@@ -64,15 +64,23 @@ def generate_map_image(map):
   return layer_images
 
 class RegistryHandler(sax.ContentHandler):
-  mapname = ""
-  registry = defaultdict(lambda: defaultdict(list))
+  def __init__(self):
+    super().__init__()
+    self.current_map_name = ""
+    self.objects_by_map_name = defaultdict(list)
   def startElement(self, name, attrs):
     if name == "root":
       pass
     elif name == "map":
-      self.mapname = attrs["name"]
+      self.current_map_name = attrs["name"]
     else:
-      self.registry[self.mapname][name].append({"x": attrs["x"], "y": attrs["y"], "frame": attrs["frame"]})
+      self.objects_by_map_name[self.current_map_name].append({
+        "name": name,
+        "x": int(float(attrs["x"])),
+        "y": int(float(attrs["y"])),
+        "frame": attrs["frame"],
+        "type": attrs.get("type", None),
+      })
   def endElement(self, name):
     pass
 
@@ -81,7 +89,7 @@ def read_registry():
   handler = RegistryHandler()
   parser.setContentHandler( handler )
   parser.parse( 'Anodyne/src/global/Registry_EmbedXML.dat')
-  return handler.registry
+  return handler.objects_by_map_name
 
 
 
@@ -225,12 +233,13 @@ def main():
   args = parser.parse_args()
 
   # read registry XML file that contains entity information
-  registry = read_registry()
+  objects_by_map_name = read_registry()
   treasure_tiles = read_tileset("Anodyne/src/entity/gadget/Treasure_S_TREASURE_SPRITE.png");
 
   if not os.path.exists("maps"):
     os.makedirs("maps")
 
+  warning_set = set()
   for mapfile in mapfiles:
     map_name = mapfile["map_name"]
     if args.map_name and map_name not in args.map_name:
@@ -240,14 +249,22 @@ def main():
     # build initial map image
     layers = generate_map_image(mapfile)
     # draw the supported entites on the maps
-    apartment_regs = registry[map_name]
-    treasures = apartment_regs["Treasure"]
-    for treasure in treasures:
-      x = int(treasure["x"])
-      y = int(treasure["y"])
+    for entity in objects_by_map_name[map_name]:
+      entity_name = entity["name"]
+      x = entity["x"]
+      y = entity["y"]
+      width = 16
+      height = 16
+      if entity_name == "Treasure":
+        sprite = treasure_tiles
+      else:
+        if entity_name not in warning_set:
+          print("WARNING: ignoring entity: {}".format(entity_name))
+          warning_set.add(entity_name)
+        continue
       if layers[2] == None:
         layers[2] = simplepng.ImageBuffer(layers[0].width, layers[0].height)
-      layers[2].paste(treasure_tiles, sx=0, sy=0, dx=x, dy=y, width=16, height=16)
+      layers[2].paste(sprite, sx=0, sy=0, dx=x, dy=y, width=width, height=height)
 
     # save images
     file_name_base = "maps/" + map_name
