@@ -498,6 +498,11 @@ def render_entities(image, entities, map_name):
     elif entity_name == "Lion":
       width = 32
       height = 32
+    elif entity_name == "Red_Walker":
+      width = 32
+      height = 48
+    elif entity_name == "Redsea_NPC":
+      sy = frame * 16 // 10
     elif entity_name == "KeyBlock":
       if frame == 0: # small key block
         pass
@@ -556,9 +561,6 @@ def render_entities(image, entities, map_name):
         sprite = sprites["npc_rock"]
         if map_name == "CELL":
           sx = 16
-        else:
-          print("WARNING: ignoring rock in map: {}".format(map_name))
-          continue
       else:
         print("WARNING: ignoring npc type: {}".format(npc_type))
         continue
