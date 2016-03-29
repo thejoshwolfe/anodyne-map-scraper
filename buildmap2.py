@@ -74,6 +74,9 @@ class RegistryHandler(sax.ContentHandler):
       pass
     elif name == "map":
       self.current_map_name = attrs["name"]
+      if self.current_map_name == "TRAIN":
+        # for some reason the entities for CELL are filed under TRAIN
+        self.current_map_name = "CELL"
     else:
       self.objects_by_map_name[self.current_map_name].append({
         "name": name,
@@ -370,14 +373,8 @@ sprite_paths = {
     "Anodyne/src/entity/player/HealthPickup_embed_Big_health.png",
     "Anodyne/src/entity/player/HealthPickup_S_SMALL_HEALTH.png",
   ],
-  "Contort": [
-    "Anodyne/src/entity/enemy/circus/Contort_contort_small_sprite.png",
-    "Anodyne/src/entity/enemy/circus/Contort_contort_big_sprite.png",
-  ],
-  "Lion": [
-    "Anodyne/src/entity/enemy/circus/Lion_lion_sprite.png",
-    "Anodyne/src/entity/enemy/circus/Lion_lion_fireball_sprite.png",
-  ],
+  "Contort": "Anodyne/src/entity/enemy/circus/Contort_contort_big_sprite.png",
+  "Lion": "Anodyne/src/entity/enemy/circus/Lion_lion_sprite.png",
   "Circus_Folks": [
     "Anodyne/src/entity/enemy/circus/Circus_Folks_javiera_juggle_sprite.png",
     "Anodyne/src/entity/enemy/circus/Circus_Folks_both_sprite.png",
@@ -435,13 +432,13 @@ sprite_paths = {
   ],
 }
 sprites = {}
-nonsolid_rail_sprite = None
 def load_sprites():
   for sprite_name in sprite_paths:
     if type(sprite_paths[sprite_name]) == str and sprite_paths[sprite_name] != "???":
       sprites[sprite_name] = read_tileset(sprite_paths[sprite_name])
-  global nonsolid_rail_sprite
-  nonsolid_rail_sprite = read_tileset("Anodyne/src/entity/decoration/Nonsolid_rail_sprite.png")
+  sprites["nonsolid_rail_sprite"] = read_tileset("Anodyne/src/entity/decoration/Nonsolid_rail_sprite.png")
+  sprites["npc_cell_bodies"] = read_tileset("Anodyne/src/entity/interactive/NPC_embed_cell_bodies.png")
+  sprites["npc_rock"] = read_tileset("Anodyne/src/entity/interactive/NPC_note_rock.png")
 
 warning_set = set()
 def render_entities(image, entities, map_name):
@@ -496,6 +493,11 @@ def render_entities(image, entities, map_name):
     elif entity_name == "Splitboss":
       width = 24
       height = 32
+    elif entity_name == "Contort":
+      height = 32
+    elif entity_name == "Lion":
+      width = 32
+      height = 32
     elif entity_name == "KeyBlock":
       if frame == 0: # small key block
         pass
@@ -504,7 +506,7 @@ def render_entities(image, entities, map_name):
         continue
     elif entity_name == "Nonsolid":
       if entity["type"] == "Rail_1":
-        sprite = nonsolid_rail_sprite
+        sprite = sprites["nonsolid_rail_sprite"]
       else:
         print("WARNING: what nonsolid type is this: {}".format(entity["type"]))
     elif entity_name == "Jump_Trigger":
@@ -520,6 +522,46 @@ def render_entities(image, entities, map_name):
         sy = 16
       if consume_dust_at(x, y):
         sx = 16
+    elif entity_name == "Chaser":
+      height = 32
+      sy = 32
+      if frame == 0:
+        sx = 32
+    elif entity_name == "Treasure":
+      if map_name == "CELL":
+        sy = 32
+    elif entity_name == "Rat":
+      if map_name == "CELL":
+        sy = 16
+    elif entity_name == "Dash_Pad":
+      sy = 16
+      sx = frame * 16
+    elif entity_name == "NPC":
+      npc_type = entity["type"]
+      if npc_type == "Cell_Body":
+        sprite = sprites["npc_cell_bodies"]
+        if frame == 0:
+          pass
+        elif frame == 2:
+          sx = 32
+        elif frame == 4:
+          sy = 16
+        elif frame == 6:
+          sx = 32
+          sy = 16
+        else:
+          print("WARNING: ignoring npc cell body frame: {}".format(frame))
+          continue
+      elif npc_type == "rock":
+        sprite = sprites["npc_rock"]
+        if map_name == "CELL":
+          sx = 16
+        else:
+          print("WARNING: ignoring rock in map: {}".format(map_name))
+          continue
+      else:
+        print("WARNING: ignoring npc type: {}".format(npc_type))
+        continue
     elif entity_name in sprites:
       if entity_name not in warning_set:
         warning_set.add(entity_name)
