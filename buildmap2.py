@@ -255,11 +255,7 @@ sprite_paths = {
   "Red_Walker": "Anodyne/src/entity/enemy/etc/Red_Walker_sprite_redwalker.png",
   "Four_Shooter": "Anodyne/src/entity/enemy/redcave/Four_Shooter_four_shooter_sprite.png",
   "Slasher": "Anodyne/src/entity/enemy/redcave/Slasher_slasher_sprite.png",
-  "On_Off_Laser": [
-    "Anodyne/src/entity/enemy/redcave/On_Off_Laser_v_on_off_sprite.png",
-    "Anodyne/src/entity/enemy/redcave/On_Off_Laser_h_on_off_sprite.png",
-    "Anodyne/src/entity/enemy/redcave/On_Off_Laser_on_off_shooter_sprite.png",
-  ],
+  "On_Off_Laser": "Anodyne/src/entity/enemy/redcave/On_Off_Laser_on_off_shooter_sprite.png",
   "Red_Pillar": [
     "Anodyne/src/entity/interactive/Red_Pillar_red_pillar_ripple_sprite.png",
     "Anodyne/src/entity/interactive/Red_Pillar_red_pillar_sprite.png",
@@ -335,10 +331,7 @@ sprite_paths = {
     "Anodyne/src/entity/decoration/Nonsolid_rail_NEXUS_sprite.png",
     "Anodyne/src/entity/decoration/Nonsolid_grass_1_sprite.png",
   ],
-  "Steam_Pipe": [
-    "Anodyne/src/entity/enemy/hotel/Steam_Pipe_steam_sprite.png",
-    "Anodyne/src/entity/enemy/hotel/Steam_Pipe_steam_pipe_sprite.png",
-  ],
+  "Steam_Pipe": "Anodyne/src/entity/enemy/hotel/Steam_Pipe_steam_pipe_sprite.png",
   "Burst_Plant": "Anodyne/src/entity/enemy/hotel/Burst_Plant_burst_plant_sprite.png",
   "Dash_Pad": "Anodyne/src/entity/gadget/Dash_Pad_dash_pad_sprite.png",
   "Elevator": "Anodyne/src/entity/interactive/Elevator_Elevator_Sprite.png",
@@ -360,10 +353,7 @@ sprite_paths = {
     "Anodyne/src/entity/enemy/circus/Circus_Folks_javiera_sprite.png",
     "Anodyne/src/entity/enemy/circus/Circus_Folks_arthur_sprite.png",
   ],
-  "Fire_Pillar": [
-    "Anodyne/src/entity/enemy/circus/Fire_Pillar_fire_pillar_base_sprite.png",
-    "Anodyne/src/entity/enemy/circus/Fire_Pillar_fire_pillar_sprite.png",
-  ],
+  "Fire_Pillar": "Anodyne/src/entity/enemy/circus/Fire_Pillar_fire_pillar_base_sprite.png",
   "Sage": "Anodyne/src/entity/interactive/npc/Sage_sage_sprite.png",
   "Mitra": [
     "Anodyne/src/entity/interactive/npc/Mitra_mitra_sprite.png",
@@ -412,7 +402,7 @@ def load_sprites():
   sprites["big_key"] = read_tileset("Anodyne/src/entity/interactive/NPC_key_green_embed.png")
   sprites["windmill_console"] = read_tileset("Anodyne/src/entity/gadget/Console_embed_windmill_inside.png")
   sprites["windmill_shell"] = read_tileset("Anodyne/src/entity/interactive/NPC_embed_windmill_shell.png")
-  sprites["big_key_gate"] = read_tileset("Anodyne/src/entity/gadget/KeyBlock_green_gate_embed.png")
+  sprites["big_gate"] = read_tileset("Anodyne/src/entity/gadget/KeyBlock_green_gate_embed.png")
 
 warning_set = set()
 def render_entities(image, entities, map_name):
@@ -462,8 +452,21 @@ def render_entities(image, entities, map_name):
         sy = 32
       else:
         print("WARNING: what Silverfish direction is this: {}".format(frame))
-    elif entity_name == "Pew_Laser":
+    elif entity_name in ("Pew_Laser", "Steam_Pipe"):
       sx = (frame & 3) * 16
+    elif entity_name == "On_Off_Laser":
+      if frame == 0:
+        sy = 16 # up
+      elif frame == 1:
+        pass # right
+        # TODO: rotate left
+      elif frame == 2:
+        pass # down
+      elif frame == 3:
+        pass # left
+        # TODO: rotate right
+      else:
+        print("WARNING: what On_Off_Laser direction is this: {}".format(frame))
     elif entity_name == "Dash_Trap":
       sy = 16
       if is_boi:
@@ -487,6 +490,8 @@ def render_entities(image, entities, map_name):
     elif entity_name == "Huge_Fucking_Stag":
       width = 64
       height = 80
+    elif entity_name == "Fire_Pillar":
+      y += 16
     elif entity_name == "Redsea_NPC":
       sy = frame * 16 // 10
     elif entity_name == "KeyBlock":
@@ -494,7 +499,7 @@ def render_entities(image, entities, map_name):
         pass # small key block
       elif frame in (1, 2, 3):
         # large key gate
-        sprite = sprites["big_key_gate"]
+        sprite = sprites["big_gate"]
         width = 32
         if frame == 1:
           sy = 7 * 16
@@ -502,6 +507,23 @@ def render_entities(image, entities, map_name):
           sy = 0
         elif frame == 3:
           sy = 6 * 16
+      elif frame == 4:
+        # card gate
+        sprite = sprites["big_gate"]
+        width = 32
+        if map_name == "OVERWORLD":
+          sy = 8 * 16
+        elif map_name == "BEACH":
+          sy = 9 * 16
+        elif map_name == "CELL":
+          sy = 13 * 16
+        elif map_name == "TERMINAL":
+          sy = 14 * 16
+        elif map_name == "NEXUS":
+          sy = 15 * 16
+        else:
+          print("WARNING: ignoring card gate in map: {}".format(map_name))
+          continue
       else:
         print("WARNING: ignoring KeyBlock frame: {}".format(frame))
         continue
@@ -605,11 +627,11 @@ def render_entities(image, entities, map_name):
       elif npc_type == "big_key":
         sprite = sprites["big_key"]
         if map_name == "BEDROOM":
-          sx = 0
+          sy = 0
         elif map_name == "REDCAVE":
-          sx = 16
+          sy = 16
         elif map_name == "CROWD":
-          sx = 32
+          sy = 32
         else: unreachable()
       elif npc_type == "generic":
         if map_name == "BEACH":
