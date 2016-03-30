@@ -534,12 +534,20 @@ def render_entities(image, entities, map_name):
           sy = 8 * 16
         elif map_name == "BEACH":
           sy = 9 * 16
+        elif map_name == "SUBURB":
+          sy = 10 * 16
         elif map_name == "CELL":
           sy = 13 * 16
         elif map_name == "TERMINAL":
           sy = 14 * 16
         elif map_name == "NEXUS":
           sy = 15 * 16
+        elif map_name == "BLANK":
+          # there are 2 here
+          if y == 864:
+            sy = 11 * 16
+          else:
+            sy = 16 * 16
         else:
           print("WARNING: ignoring card gate in map: {}".format(map_name))
           continue
