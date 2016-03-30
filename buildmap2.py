@@ -29,9 +29,14 @@ def read_layer(filename):
   return map
 
 
-def read_tileset(filename):
+def read_tileset(filename, fade=False):
   with open(filename, "rb") as f:
-    return simplepng.read_png(f)
+    image = simplepng.read_png(f)
+  if fade:
+    # apply semitransparency by clearing the msb of the alpha channel
+    for i in range(len(image.data)):
+      image.data[i] &= 0xffffff7f
+  return image
 
 def paint_with_layer(image, layer, tileset):
   y_blocks = len(layer)
@@ -281,7 +286,6 @@ sprite_paths = {
     "Anodyne/src/entity/interactive/NPC_note_rock.png",
     "Anodyne/src/entity/interactive/NPC_npc_biofilm.png",
     "Anodyne/src/entity/interactive/NPC_embed_smoke_red.png",
-    "Anodyne/src/entity/interactive/NPC_embed_blue_npcs.png",
     "Anodyne/src/entity/interactive/NPC_npc_spritesheet.png",
   ],
   "Red_Boss": [
@@ -299,12 +303,6 @@ sprite_paths = {
   "Person": "Anodyne/src/entity/enemy/crowd/Person_person_sprite.png",
   "Rotator": "Anodyne/src/entity/enemy/crowd/Rotator_rotator_sprite.png",
   "Frog": "Anodyne/src/entity/enemy/crowd/Frog_frog_sprite.png",
-  "Spike_Roller": [
-    "Anodyne/src/entity/enemy/crowd/Spike_Roller_Spike_Roller_Sprite_H.png",
-    "Anodyne/src/entity/enemy/crowd/Spike_Roller_vert_shadow_sprite.png",
-    "Anodyne/src/entity/enemy/crowd/Spike_Roller_hori_shadow_sprite.png",
-    "Anodyne/src/entity/enemy/crowd/Spike_Roller_Spike_Roller_Sprite.png",
-  ],
   "Dog": "Anodyne/src/entity/enemy/crowd/Dog_dog_sprite.png",
   "WallBoss": [
     "Anodyne/src/entity/enemy/crowd/WallBoss_wall_sprite.png",
@@ -346,13 +344,6 @@ sprite_paths = {
   ],
   "Contort": "Anodyne/src/entity/enemy/circus/Contort_contort_big_sprite.png",
   "Lion": "Anodyne/src/entity/enemy/circus/Lion_lion_sprite.png",
-  "Circus_Folks": [
-    "Anodyne/src/entity/enemy/circus/Circus_Folks_javiera_juggle_sprite.png",
-    "Anodyne/src/entity/enemy/circus/Circus_Folks_both_sprite.png",
-    "Anodyne/src/entity/enemy/circus/Circus_Folks_shockwave_sprite.png",
-    "Anodyne/src/entity/enemy/circus/Circus_Folks_javiera_sprite.png",
-    "Anodyne/src/entity/enemy/circus/Circus_Folks_arthur_sprite.png",
-  ],
   "Fire_Pillar": "Anodyne/src/entity/enemy/circus/Fire_Pillar_fire_pillar_base_sprite.png",
   "Sage": "Anodyne/src/entity/interactive/npc/Sage_sage_sprite.png",
   "Mitra": [
@@ -364,7 +355,6 @@ sprite_paths = {
   "Dungeon_Statue": "Anodyne/src/entity/interactive/Dungeon_Statue_statue_bedroom_embed.png",
   "Chaser": "Anodyne/src/entity/enemy/etc/Chaser_embed_chaser_sprite.png",
   "Space_Face": "???",
-  "Water_Anim": "???",
   "Go_Detector": "???",
   "Sage_Boss": [
     "Anodyne/src/entity/enemy/etc/Sage_Boss_embed_sage_attacks.png",
@@ -403,6 +393,14 @@ def load_sprites():
   sprites["windmill_console"] = read_tileset("Anodyne/src/entity/gadget/Console_embed_windmill_inside.png")
   sprites["windmill_shell"] = read_tileset("Anodyne/src/entity/interactive/NPC_embed_windmill_shell.png")
   sprites["big_gate"] = read_tileset("Anodyne/src/entity/gadget/KeyBlock_green_gate_embed.png")
+  sprites["Spike_Roller_V"] = read_tileset("Anodyne/src/entity/enemy/crowd/Spike_Roller_Spike_Roller_Sprite.png")
+  sprites["Spike_Roller_H"] = read_tileset("Anodyne/src/entity/enemy/crowd/Spike_Roller_Spike_Roller_Sprite_H.png")
+  sprites["Spike_Roller_V_S"] = read_tileset("Anodyne/src/entity/enemy/crowd/Spike_Roller_vert_shadow_sprite.png", fade=True)
+  sprites["Spike_Roller_H_S"] = read_tileset("Anodyne/src/entity/enemy/crowd/Spike_Roller_hori_shadow_sprite.png", fade=True)
+  sprites["npc_snowman"] = read_tileset("Anodyne/src/entity/interactive/NPC_embed_blue_npcs.png")
+  sprites["circus_folks_arthur"] = read_tileset("Anodyne/src/entity/enemy/circus/Circus_Folks_arthur_sprite.png")
+  sprites["circus_folks_javiera"] = read_tileset("Anodyne/src/entity/enemy/circus/Circus_Folks_javiera_sprite.png")
+  sprites["circus_folks_both"] = read_tileset("Anodyne/src/entity/enemy/circus/Circus_Folks_both_sprite.png")
 
 warning_set = set()
 def render_entities(image, entities, map_name):
@@ -471,7 +469,7 @@ def render_entities(image, entities, map_name):
       sy = 16
       if is_boi:
         sx = 32
-    elif entity_name in ("Gasguy", "Teleguy", "Sun_Guy"):
+    elif entity_name in ("Gasguy", "Teleguy", "Sun_Guy", "Dustmaid"):
       height = 24
     elif entity_name == "Slasher":
       width = 24
@@ -494,6 +492,21 @@ def render_entities(image, entities, map_name):
       y += 16
     elif entity_name == "Redsea_NPC":
       sy = frame * 16 // 10
+    elif entity_name == "Circus_Folks":
+      if frame == 0:
+        # arthur
+        sprite = sprites["circus_folks_arthur"]
+        y -= 7 * 16
+        sy = 64
+      elif frame == 1:
+        # javiera
+        sprite = sprites["circus_folks_javiera"]
+      elif frame == 2:
+        # both?
+        sprite = sprites["circus_folks_both"]
+        y -= 64
+        height = 32
+      else: unreachable()
     elif entity_name == "KeyBlock":
       if frame == 0:
         pass # small key block
@@ -577,6 +590,22 @@ def render_entities(image, entities, map_name):
     elif entity_name == "Dash_Pad":
       sy = 16
       sx = frame * 16
+    elif entity_name == "Spike_Roller":
+      if frame in (0, 3):
+        sprite = sprites["Spike_Roller_H_S"]
+        width = 128
+      elif frame in (1, 2):
+        sprite = sprites["Spike_Roller_V_S"]
+        height = 128
+      elif frame in (4, 7):
+        sprite = sprites["Spike_Roller_H"]
+        width = 128
+      elif frame in (5, 6):
+        sprite = sprites["Spike_Roller_V"]
+        height = 128
+      else:
+        print("WARNING: ignoring Spike_Roller frame: {}".format(frame))
+        continue
     elif entity_name == "Button":
       if map_name == "REDCAVE":
         sy = 32
@@ -589,6 +618,9 @@ def render_entities(image, entities, map_name):
         pass
       elif map_name == "REDCAVE":
         sx = 32
+      elif map_name == "CIRCUS":
+        sx = 32
+        sy = 16
       else:
         print("WARNING: ignoring {} in map: {}".format(entity_name, map_name))
         continue
@@ -645,12 +677,25 @@ def render_entities(image, entities, map_name):
         elif map_name == "WINDMILL":
           # don't bother rendering the windmill blades
           continue
+        elif map_name == "BLUE":
+          sprite = sprites["npc_snowman"]
+        elif map_name == "HAPPY":
+          # invisible NPC that talks to you at the save point
+          continue
+        elif map_name == "CELL":
+          sprite = sprites["npc_cell_bodies"]
+          sy = 32
         else:
           print("WARNING: ignoring generic npc in map: {}".format(map_name))
           continue
       else:
         print("WARNING: ignoring npc type: {}".format(npc_type))
         continue
+    elif entity_name == "Happy_NPC":
+      if frame == 18:
+        continue # briar walking along a trough thing
+      if frame in (0,1,3):
+        sy = 16 # male
     elif entity_name == "Fisherman":
       sprite = sprites["beach_npcs"]
       sy = 16
@@ -675,7 +720,7 @@ def render_entities(image, entities, map_name):
         sy = 32
     elif entity_name == "Door":
       door_type = entity["type"]
-      if door_type in ("1", "5", "9", "10", "12", "15"):
+      if door_type in ("1", "5", "9", "10", "11", "12", "15"):
         continue # invisible
       elif door_type == "4":
         sprite = sprites["door_portal"]
@@ -692,11 +737,11 @@ def render_entities(image, entities, map_name):
       else:
         print("WARNING: ignoring door type: {}".format(door_type))
         continue
-    elif entity_name == "solid_tile":
+    elif entity_name in ("solid_tile", "Water_Anim"):
       continue # invisible
     elif entity_name == "Solid_Sprite":
       solid_type = entity["type"]
-      if solid_type in "blocker":
+      if solid_type in ("blocker", "vblock"):
         continue # invisible
       else:
         print("WARNING: ignoring Solid_Sprite type: {}".format(solid_type))
