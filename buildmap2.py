@@ -439,6 +439,8 @@ def load_sprites():
   sprites["nonsolid_rail_sprite"] = read_tileset("Anodyne/src/entity/decoration/Nonsolid_rail_sprite.png")
   sprites["npc_cell_bodies"] = read_tileset("Anodyne/src/entity/interactive/NPC_embed_cell_bodies.png")
   sprites["npc_rock"] = read_tileset("Anodyne/src/entity/interactive/NPC_note_rock.png")
+  sprites["door_portal"] = read_tileset("Anodyne/src/entity/gadget/Door_White_Portal_Sprite.png")
+  sprites["nexus_pad"] = read_tileset("Anodyne/src/entity/interactive/NPC_embed_nexus_pad.png")
 
 warning_set = set()
 def render_entities(image, entities, map_name):
@@ -466,6 +468,7 @@ def render_entities(image, entities, map_name):
     width = 16
     height = 16
     sprite = sprites.get(entity_name, None)
+    is_boi = map_name == "REDCAVE" and y > 1000
     if entity_name == "Switch_Pillar":
       sx = frame * 16
     elif entity_name == "Silverfish":
@@ -485,6 +488,8 @@ def render_entities(image, entities, map_name):
         print("WARNING: what Silverfish direction is this: {}".format(frame))
     elif entity_name == "Dash_Trap":
       sy = 16
+      if is_boi:
+        sx = 32
     elif entity_name in ("Gasguy", "Teleguy"):
       height = 24
     elif entity_name == "Slasher":
@@ -501,6 +506,9 @@ def render_entities(image, entities, map_name):
     elif entity_name == "Red_Walker":
       width = 32
       height = 48
+    elif entity_name == "Huge_Fucking_Stag":
+      width = 64
+      height = 80
     elif entity_name == "Redsea_NPC":
       sy = frame * 16 // 10
     elif entity_name == "KeyBlock":
@@ -522,6 +530,9 @@ def render_entities(image, entities, map_name):
         if entity["type"] != "1":
           # only type=1 is visible
           continue
+    elif entity_name == "Gate":
+      if map_name == "BLANK":
+        sy = 32
     elif entity_name == "Propelled":
       if (frame & 1) == 0:
         sy = 16
@@ -541,6 +552,13 @@ def render_entities(image, entities, map_name):
     elif entity_name == "Dash_Pad":
       sy = 16
       sx = frame * 16
+    elif entity_name == "Button":
+      if map_name == "REDCAVE":
+        sy = 32
+      elif map_name == "CELL":
+        sy = 64
+      else:
+        sy = 16
     elif entity_name == "NPC":
       npc_type = entity["type"]
       if npc_type == "Cell_Body":
@@ -564,6 +582,53 @@ def render_entities(image, entities, map_name):
       else:
         print("WARNING: ignoring npc type: {}".format(npc_type))
         continue
+    elif entity_name == "Health_Cicada":
+      if map_name == "CELL":
+        sy = 32
+    elif entity_name == "Annoyer":
+      if map_name == "CELL":
+        sy = 16
+      elif frame == 0:
+        sy = 0
+      elif frame == 2:
+        sy = 32
+      elif frame == 8:
+        sx = 32
+        sy = 16
+    elif entity_name == "Slime":
+      if is_boi:
+        sx = 32
+    elif entity_name == "Frog":
+      if is_boi:
+        sy = 32
+    elif entity_name == "Door":
+      door_type = entity["type"]
+      if door_type in ("1", "5", "10"):
+        continue # invisible
+      elif door_type == "4":
+        sprite = sprites["door_portal"]
+        if map_name == "CELL":
+          sy = 16
+      elif door_type == "16":
+        sprite = sprites["nexus_pad"]
+        width = 32
+        height = 32
+        if map_name == "CELL":
+          sy = 32
+      else:
+        print("WARNING: ignoring door type: {}".format(door_type))
+        continue
+    elif entity_name == "Solid_Sprite":
+      solid_type = entity["type"]
+      if solid_type == "blocker":
+        continue # invisible
+      else:
+        print("WARNING: ignoring Solid_Sprite type: {}".format(solid_type))
+        continue
+    elif entity_name in ("Pillar_Switch", "Dog", "Shieldy", "Rotator", "Dust"):
+      pass # simple
+    elif entity_name in ("Stop_Marker", "Event"):
+      continue # invisible
     elif entity_name in sprites:
       if entity_name not in warning_set:
         warning_set.add(entity_name)
