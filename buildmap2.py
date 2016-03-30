@@ -393,6 +393,7 @@ def load_sprites():
   sprites["windmill_console"] = read_tileset("Anodyne/src/entity/gadget/Console_embed_windmill_inside.png")
   sprites["windmill_shell"] = read_tileset("Anodyne/src/entity/interactive/NPC_embed_windmill_shell.png")
   sprites["big_gate"] = read_tileset("Anodyne/src/entity/gadget/KeyBlock_green_gate_embed.png")
+  sprites["checkpoint"] = read_tileset("Anodyne/src/entity/gadget/Checkpoint_checkpoint_sprite.png")
   sprites["Spike_Roller_V"] = read_tileset("Anodyne/src/entity/enemy/crowd/Spike_Roller_Spike_Roller_Sprite.png")
   sprites["Spike_Roller_H"] = read_tileset("Anodyne/src/entity/enemy/crowd/Spike_Roller_Spike_Roller_Sprite_H.png")
   sprites["Spike_Roller_V_S"] = read_tileset("Anodyne/src/entity/enemy/crowd/Spike_Roller_vert_shadow_sprite.png", fade=True)
@@ -774,8 +775,15 @@ def render_entities(image, entities, map_name):
         "Burst_Plant", "Four_Shooter", "Eye_Light",
       ):
       pass # simple
-    elif entity_name in ("Stop_Marker", "Event"):
+    elif entity_name == "Stop_Marker":
       continue # invisible
+    elif entity_name == "Event":
+      if frame == 2:
+        sprite = sprites["checkpoint"]
+        if map_name == "CELL":
+          sy = 16
+      else:
+        continue # invisible
     elif entity_name in sprites:
       if entity_name not in warning_set:
         warning_set.add(entity_name)
