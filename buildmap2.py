@@ -249,10 +249,7 @@ sprite_paths = {
   "Shieldy": "Anodyne/src/entity/enemy/bedroom/Shieldy_SPRITE_SHIELDY.png",
   "Pew_Laser": "Anodyne/src/entity/enemy/bedroom/Pew_Laser_PEW_LASER.png",
   "Annoyer": "Anodyne/src/entity/enemy/bedroom/Annoyer_S_ANNOYER_SPRITE.png",
-  "Console": [
-    "Anodyne/src/entity/gadget/Console_embed_windmill_inside.png",
-    "Anodyne/src/entity/gadget/Console_sprite_console.png",
-  ],
+  "Console": "Anodyne/src/entity/gadget/Console_sprite_console.png",
   "Follower_Bro": "Anodyne/src/entity/enemy/etc/Follower_Bro_sprite_follower.png",
   "Sadbro": "Anodyne/src/entity/enemy/etc/Sadbro_sadman_sprite.png",
   "Red_Walker": "Anodyne/src/entity/enemy/etc/Red_Walker_sprite_redwalker.png",
@@ -285,7 +282,6 @@ sprite_paths = {
     "Anodyne/src/entity/interactive/NPC_embed_nexus_pad.png",
     "Anodyne/src/entity/interactive/NPC_embed_windmill_blade.png",
     "Anodyne/src/entity/interactive/NPC_embed_randoms.png",
-    "Anodyne/src/entity/interactive/NPC_embed_windmill_shell.png",
     "Anodyne/src/entity/interactive/NPC_note_rock.png",
     "Anodyne/src/entity/interactive/NPC_npc_biofilm.png",
     "Anodyne/src/entity/interactive/NPC_embed_smoke_red.png",
@@ -414,6 +410,9 @@ def load_sprites():
   sprites["whirlpool"] = read_tileset("Anodyne/src/entity/gadget/Door_Whirlpool_Door_Sprite.png")
   sprites["npc_sage_statue"] = read_tileset("Anodyne/src/entity/interactive/NPC_sage_statue.png")
   sprites["big_key"] = read_tileset("Anodyne/src/entity/interactive/NPC_key_green_embed.png")
+  sprites["windmill_console"] = read_tileset("Anodyne/src/entity/gadget/Console_embed_windmill_inside.png")
+  sprites["windmill_shell"] = read_tileset("Anodyne/src/entity/interactive/NPC_embed_windmill_shell.png")
+  sprites["big_key_gate"] = read_tileset("Anodyne/src/entity/gadget/KeyBlock_green_gate_embed.png")
 
 warning_set = set()
 def render_entities(image, entities, map_name):
@@ -444,6 +443,7 @@ def render_entities(image, entities, map_name):
     width = 16
     height = 16
     sprite = sprites.get(entity_name, None)
+    sprite2 = None
     is_boi = map_name == "REDCAVE" and y > 1000
     if entity_name == "Switch_Pillar":
       sx = frame * 16
@@ -490,8 +490,18 @@ def render_entities(image, entities, map_name):
     elif entity_name == "Redsea_NPC":
       sy = frame * 16 // 10
     elif entity_name == "KeyBlock":
-      if frame == 0: # small key block
-        pass
+      if frame == 0:
+        pass # small key block
+      elif frame in (1, 2, 3):
+        # large key gate
+        sprite = sprites["big_key_gate"]
+        width = 32
+        if frame == 1:
+          sy = 7 * 16
+        elif frame == 2:
+          sy = 0
+        elif frame == 3:
+          sy = 6 * 16
       else:
         print("WARNING: ignoring KeyBlock frame: {}".format(frame))
         continue
@@ -511,6 +521,12 @@ def render_entities(image, entities, map_name):
     elif entity_name == "Gate":
       if map_name == "BLANK":
         sy = 32
+    elif entity_name == "Console":
+      if map_name == "WINDMILL":
+        sprite = sprites["windmill_console"]
+        sprite2 = sprites["windmill_shell"]
+        width = 48
+        height = 48
     elif entity_name == "Propelled":
       if (frame & 1) == 0:
         sy = 16
@@ -604,6 +620,9 @@ def render_entities(image, entities, map_name):
             sprite = sprites["Trade_NPC"]
             sx = 96
             sy = 128
+        elif map_name == "WINDMILL":
+          # don't bother rendering the windmill blades
+          continue
         else:
           print("WARNING: ignoring generic npc in map: {}".format(map_name))
           continue
@@ -674,6 +693,8 @@ def render_entities(image, entities, map_name):
     if sprite != None:
       image.paste(sprite, sx=sx, sy=sy, dx=x, dy=y, width=width, height=height)
       did_anything = True
+      if sprite2 != None:
+        image.paste(sprite2, sx=sx, sy=sy, dx=x, dy=y, width=width, height=height)
     else:
       if entity_name not in warning_set:
         warning_set.add(entity_name)
