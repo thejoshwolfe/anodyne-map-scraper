@@ -279,12 +279,10 @@ sprite_paths = {
     "Anodyne/src/entity/interactive/NPC_embed_cube_kings.png",
     "Anodyne/src/entity/interactive/NPC_embed_cell_bodies.png",
     "Anodyne/src/entity/interactive/NPC_embed_geoms.png",
-    "Anodyne/src/entity/interactive/NPC_embed_cliff_npcs.png",
     "Anodyne/src/entity/interactive/NPC_embed_nexus_pad.png",
     "Anodyne/src/entity/interactive/NPC_embed_windmill_blade.png",
     "Anodyne/src/entity/interactive/NPC_embed_randoms.png",
     "Anodyne/src/entity/interactive/NPC_note_rock.png",
-    "Anodyne/src/entity/interactive/NPC_npc_biofilm.png",
     "Anodyne/src/entity/interactive/NPC_embed_smoke_red.png",
     "Anodyne/src/entity/interactive/NPC_npc_spritesheet.png",
   ],
@@ -346,11 +344,12 @@ sprite_paths = {
   "Lion": "Anodyne/src/entity/enemy/circus/Lion_lion_sprite.png",
   "Fire_Pillar": "Anodyne/src/entity/enemy/circus/Fire_Pillar_fire_pillar_base_sprite.png",
   "Sage": "Anodyne/src/entity/interactive/npc/Sage_sage_sprite.png",
-  "Mitra": [
-    "Anodyne/src/entity/interactive/npc/Mitra_mitra_sprite.png",
-    "Anodyne/src/entity/interactive/npc/Mitra_bike_sprite.png",
-    "Anodyne/src/entity/interactive/npc/Mitra_mitra_on_bike_sprite.png",
-  ],
+  "Mitra": "Anodyne/src/entity/interactive/npc/Mitra_mitra_sprite.png",
+  #"Mitra": [
+  #  "Anodyne/src/entity/interactive/npc/Mitra_mitra_sprite.png",
+  #  "Anodyne/src/entity/interactive/npc/Mitra_bike_sprite.png",
+  #  "Anodyne/src/entity/interactive/npc/Mitra_mitra_on_bike_sprite.png",
+  #],
   "Health_Cicada": "Anodyne/src/entity/interactive/Health_Cicada_health_cicada_embed.png",
   "Dungeon_Statue": "Anodyne/src/entity/interactive/Dungeon_Statue_statue_bedroom_embed.png",
   "Chaser": "Anodyne/src/entity/enemy/etc/Chaser_embed_chaser_sprite.png",
@@ -382,6 +381,7 @@ def load_sprites():
     if type(sprite_paths[sprite_name]) == str and sprite_paths[sprite_name] != "???":
       sprites[sprite_name] = read_tileset(sprite_paths[sprite_name])
   sprites["nonsolid_rail_sprite"] = read_tileset("Anodyne/src/entity/decoration/Nonsolid_rail_sprite.png")
+  sprites["nonsolid_rail_crowd"] = read_tileset("Anodyne/src/entity/decoration/Nonsolid_rail_CROWD_sprite.png")
   sprites["npc_cell_bodies"] = read_tileset("Anodyne/src/entity/interactive/NPC_embed_cell_bodies.png")
   sprites["npc_rock"] = read_tileset("Anodyne/src/entity/interactive/NPC_note_rock.png")
   sprites["door_portal"] = read_tileset("Anodyne/src/entity/gadget/Door_White_Portal_Sprite.png")
@@ -401,6 +401,11 @@ def load_sprites():
   sprites["circus_folks_arthur"] = read_tileset("Anodyne/src/entity/enemy/circus/Circus_Folks_arthur_sprite.png")
   sprites["circus_folks_javiera"] = read_tileset("Anodyne/src/entity/enemy/circus/Circus_Folks_javiera_sprite.png")
   sprites["circus_folks_both"] = read_tileset("Anodyne/src/entity/enemy/circus/Circus_Folks_both_sprite.png")
+  sprites["npc_golem"] = read_tileset("Anodyne/src/entity/interactive/NPC_embed_cliff_npcs.png")
+  sprites["biofilm"] = read_tileset("Anodyne/src/entity/interactive/NPC_npc_biofilm.png")
+  sprites["wall_boss_wall"] = read_tileset("Anodyne/src/entity/enemy/crowd/WallBoss_wall_sprite.png")
+  sprites["wall_boss_mouth"] = read_tileset("Anodyne/src/entity/enemy/crowd/WallBoss_face_sprite.png")
+  sprites["wall_boss_hand"] = read_tileset("Anodyne/src/entity/enemy/crowd/WallBoss_l_hand_sprite.png")
 
 warning_set = set()
 def render_entities(image, entities, map_name):
@@ -541,10 +546,13 @@ def render_entities(image, entities, map_name):
         print("WARNING: ignoring KeyBlock frame: {}".format(frame))
         continue
     elif entity_name == "Nonsolid":
-      if entity["type"] == "Rail_1":
+      nonsolid_type = entity["type"]
+      if nonsolid_type == "Rail_1":
         sprite = sprites["nonsolid_rail_sprite"]
+      elif nonsolid_type == "Rail_CROWD":
+        sprite = sprites["nonsolid_rail_crowd"]
       else:
-        print("WARNING: what nonsolid type is this: {}".format(entity["type"]))
+        print("WARNING: what nonsolid type is this: {}".format(nonsolid_type))
     elif entity_name == "Jump_Trigger":
       if map_name in ("APARTMENT", "CLIFF", "BEACH", "CROWD"):
         # jump triggers are invisible in these maps
@@ -685,9 +693,19 @@ def render_entities(image, entities, map_name):
         elif map_name == "CELL":
           sprite = sprites["npc_cell_bodies"]
           sy = 32
+        elif map_name == "CLIFF":
+          if frame == 7:
+            sprite = sprites["npc_golem"]
+          elif frame == 6:
+            sprite = sprites["Dog"]
+          else: unreachable()
         else:
           print("WARNING: ignoring generic npc in map: {}".format(map_name))
           continue
+      elif npc_type == "biofilm":
+        sprite = sprites["biofilm"]
+        width = 32
+        height = 32
       else:
         print("WARNING: ignoring npc type: {}".format(npc_type))
         continue
@@ -699,6 +717,11 @@ def render_entities(image, entities, map_name):
     elif entity_name == "Fisherman":
       sprite = sprites["beach_npcs"]
       sy = 16
+    elif entity_name == "Person":
+      # there's information to rotate the persons,
+      # but they rotate themselves randomly before you can see it in game,
+      # so whatever
+      pass
     elif entity_name == "Health_Cicada":
       if map_name == "CELL":
         sy = 32
@@ -720,7 +743,7 @@ def render_entities(image, entities, map_name):
         sy = 32
     elif entity_name == "Door":
       door_type = entity["type"]
-      if door_type in ("1", "5", "9", "10", "11", "12", "15"):
+      if door_type in ("1", "5", "6", "8", "9", "10", "11", "12", "14", "15"):
         continue # invisible
       elif door_type == "4":
         sprite = sprites["door_portal"]
@@ -757,7 +780,16 @@ def render_entities(image, entities, map_name):
       if entity_name not in warning_set:
         warning_set.add(entity_name)
         print("default rendering sprite: {}".format(entity_name))
-    if sprite != None:
+
+    if entity_name == "WallBoss":
+      # special case for all these sprites
+      image.paste(sprites["wall_boss_wall"], dx=1440, dy=960, width=160, height=32)
+      image.paste(sprites["wall_boss_mouth"], sx=16, dx=1504, dy=960, width=32, height=32)
+      image.paste(sprites["wall_boss_hand"], dx=1456, dy=992, width=32, height=32)
+      # TODO: horizontal flip
+      image.paste(sprites["wall_boss_hand"], dx=1552, dy=992, width=32, height=32)
+      did_anything = True
+    elif sprite != None:
       image.paste(sprite, sx=sx, sy=sy, dx=x, dy=y, width=width, height=height)
       did_anything = True
       if sprite2 != None:
