@@ -502,13 +502,24 @@ def render_entities(image, entities, map_name):
       if frame == 0:
         # arthur
         sprite = sprites["circus_folks_arthur"]
-        y -= 7 * 16
         sy = 64
+        if x < 1340:
+          # percarious
+          y -= 7 * 16
+        else:
+          # dead
+          sx = 32
       elif frame == 1:
         # javiera
         sprite = sprites["circus_folks_javiera"]
+        if x < 1340:
+          # lions closing in
+          pass
+        else:
+          # dead
+          sy = 48
       elif frame == 2:
-        # both?
+        # both
         sprite = sprites["circus_folks_both"]
         y -= 64
         height = 32
