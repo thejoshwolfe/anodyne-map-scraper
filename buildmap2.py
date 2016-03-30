@@ -232,10 +232,8 @@ sprite_paths = {
     "Anodyne/src/entity/gadget/Door_embed_nexus_cardgem.png",
     "Anodyne/src/entity/gadget/Door_Nexus_door_overlay_embed.png",
     "Anodyne/src/entity/gadget/Door_Sprite_nexus_door.png",
-    "Anodyne/src/entity/gadget/Door_White_Portal_Sprite.png",
     "Anodyne/src/entity/gadget/Door_Door_Sprites.png",
     "Anodyne/src/entity/gadget/Door_Nexus_door_previews_embed.png",
-    "Anodyne/src/entity/gadget/Door_Whirlpool_Door_Sprite.png",
   ],
   "Wall_Laser": "???",
   "Eye_Light": "Anodyne/src/entity/decoration/Eye_Light_Eye_Light_Sprite.png",
@@ -246,17 +244,10 @@ sprite_paths = {
   "Treasure": "Anodyne/src/entity/gadget/Treasure_S_TREASURE_SPRITE.png",
   "CrackedTile": "Anodyne/src/entity/gadget/CrackedTile_C_CRACKED_TILES.png",
   "Button": "Anodyne/src/entity/gadget/Button_S_BUTTON.png",
-  "Sun_Guy": [
-    "Anodyne/src/entity/enemy/bedroom/Sun_Guy_C_SUN_GUY.png",
-    "Anodyne/src/entity/enemy/bedroom/Sun_Guy_C_SUN_GUY_WAVE.png",
-    "Anodyne/src/entity/enemy/bedroom/Sun_Guy_C_LIGHT_ORB.png",
-  ],
+  "Sun_Guy": "Anodyne/src/entity/enemy/bedroom/Sun_Guy_C_SUN_GUY.png",
   "Dust": "Anodyne/src/entity/gadget/Dust_DUST_SPRITE.png",
   "Shieldy": "Anodyne/src/entity/enemy/bedroom/Shieldy_SPRITE_SHIELDY.png",
-  "Pew_Laser": [
-    "Anodyne/src/entity/enemy/bedroom/Pew_Laser_PEW_LASER_BULLET.png",
-    "Anodyne/src/entity/enemy/bedroom/Pew_Laser_PEW_LASER.png",
-  ],
+  "Pew_Laser": "Anodyne/src/entity/enemy/bedroom/Pew_Laser_PEW_LASER.png",
   "Annoyer": "Anodyne/src/entity/enemy/bedroom/Annoyer_S_ANNOYER_SPRITE.png",
   "Console": [
     "Anodyne/src/entity/gadget/Console_embed_windmill_inside.png",
@@ -265,10 +256,7 @@ sprite_paths = {
   "Follower_Bro": "Anodyne/src/entity/enemy/etc/Follower_Bro_sprite_follower.png",
   "Sadbro": "Anodyne/src/entity/enemy/etc/Sadbro_sadman_sprite.png",
   "Red_Walker": "Anodyne/src/entity/enemy/etc/Red_Walker_sprite_redwalker.png",
-  "Four_Shooter": [
-    "Anodyne/src/entity/enemy/redcave/Four_Shooter_four_shooter_bullet_sprite.png",
-    "Anodyne/src/entity/enemy/redcave/Four_Shooter_four_shooter_sprite.png",
-  ],
+  "Four_Shooter": "Anodyne/src/entity/enemy/redcave/Four_Shooter_four_shooter_sprite.png",
   "Slasher": "Anodyne/src/entity/enemy/redcave/Slasher_slasher_sprite.png",
   "On_Off_Laser": [
     "Anodyne/src/entity/enemy/redcave/On_Off_Laser_v_on_off_sprite.png",
@@ -293,14 +281,11 @@ sprite_paths = {
     "Anodyne/src/entity/interactive/NPC_embed_cube_kings.png",
     "Anodyne/src/entity/interactive/NPC_embed_cell_bodies.png",
     "Anodyne/src/entity/interactive/NPC_embed_geoms.png",
-    "Anodyne/src/entity/interactive/NPC_embed_beach_npcs.png",
     "Anodyne/src/entity/interactive/NPC_embed_cliff_npcs.png",
     "Anodyne/src/entity/interactive/NPC_embed_nexus_pad.png",
     "Anodyne/src/entity/interactive/NPC_embed_windmill_blade.png",
     "Anodyne/src/entity/interactive/NPC_embed_randoms.png",
-    "Anodyne/src/entity/interactive/NPC_sage_statue.png",
     "Anodyne/src/entity/interactive/NPC_embed_windmill_shell.png",
-    "Anodyne/src/entity/interactive/NPC_key_green_embed.png",
     "Anodyne/src/entity/interactive/NPC_note_rock.png",
     "Anodyne/src/entity/interactive/NPC_npc_biofilm.png",
     "Anodyne/src/entity/interactive/NPC_embed_smoke_red.png",
@@ -358,10 +343,7 @@ sprite_paths = {
     "Anodyne/src/entity/enemy/hotel/Steam_Pipe_steam_sprite.png",
     "Anodyne/src/entity/enemy/hotel/Steam_Pipe_steam_pipe_sprite.png",
   ],
-  "Burst_Plant": [
-    "Anodyne/src/entity/enemy/hotel/Burst_Plant_burst_plant_bullet_sprite.png",
-    "Anodyne/src/entity/enemy/hotel/Burst_Plant_burst_plant_sprite.png",
-  ],
+  "Burst_Plant": "Anodyne/src/entity/enemy/hotel/Burst_Plant_burst_plant_sprite.png",
   "Dash_Pad": "Anodyne/src/entity/gadget/Dash_Pad_dash_pad_sprite.png",
   "Elevator": "Anodyne/src/entity/interactive/Elevator_Elevator_Sprite.png",
   "Eye_Boss": [
@@ -404,20 +386,7 @@ sprite_paths = {
     "Anodyne/src/entity/enemy/etc/Sage_Boss_embed_sage_boss.png",
     "Anodyne/src/entity/enemy/etc/Sage_Boss_embed_sage_long_attacks.png",
   ],
-  "Shadow_Briar": [
-    "Anodyne/src/entity/enemy/etc/Briar_Boss_embed_mist.png",
-    "Anodyne/src/entity/enemy/etc/Briar_Boss_embed_ground_thorn.png",
-    "Anodyne/src/entity/enemy/etc/Briar_Boss_embed_thorn_bullet.png",
-    "Anodyne/src/entity/enemy/etc/Briar_Boss_embed_happy_thorn.png",
-    "Anodyne/src/entity/enemy/etc/Briar_Boss_embed_ice_crystal.png",
-    "Anodyne/src/entity/enemy/etc/Briar_Boss_embed_body_thorn.png",
-    "Anodyne/src/entity/enemy/etc/Briar_Boss_embed_briar_core.png",
-    "Anodyne/src/entity/enemy/etc/Briar_Boss_embed_overhang.png",
-    "Anodyne/src/entity/enemy/etc/Briar_Boss_embed_ice_explosion.png",
-    "Anodyne/src/entity/enemy/etc/Briar_Boss_embed_dust_explosion.png",
-    "Anodyne/src/entity/enemy/etc/Briar_Boss_embed_blue_thorn.png",
-    "Anodyne/src/entity/enemy/etc/Briar_Boss_embed_fire_eye.png",
-  ],
+  "Shadow_Briar": "Anodyne/src/entity/interactive/npc/Shadow_Briar_embed_briar.png",
   "Trade_NPC": "Anodyne/src/entity/interactive/npc/Trade_NPC_embed_dame_trade_npc.png",
   "Forest_NPC": "Anodyne/src/entity/interactive/npc/Forest_NPC_embed_forest_npcs.png",
   "Redsea_NPC": "Anodyne/src/entity/interactive/npc/Redsea_NPC_embed_redsea_npcs.png",
@@ -441,6 +410,10 @@ def load_sprites():
   sprites["npc_rock"] = read_tileset("Anodyne/src/entity/interactive/NPC_note_rock.png")
   sprites["door_portal"] = read_tileset("Anodyne/src/entity/gadget/Door_White_Portal_Sprite.png")
   sprites["nexus_pad"] = read_tileset("Anodyne/src/entity/interactive/NPC_embed_nexus_pad.png")
+  sprites["beach_npcs"] = read_tileset("Anodyne/src/entity/interactive/NPC_embed_beach_npcs.png")
+  sprites["whirlpool"] = read_tileset("Anodyne/src/entity/gadget/Door_Whirlpool_Door_Sprite.png")
+  sprites["npc_sage_statue"] = read_tileset("Anodyne/src/entity/interactive/NPC_sage_statue.png")
+  sprites["big_key"] = read_tileset("Anodyne/src/entity/interactive/NPC_key_green_embed.png")
 
 warning_set = set()
 def render_entities(image, entities, map_name):
@@ -462,6 +435,9 @@ def render_entities(image, entities, map_name):
     entity_name = entity["name"]
     x = entity["x"]
     y = entity["y"]
+    if x < 0 or y < 0:
+      print("WARNING: ignoring out of bounds entity: {}, {}".format(x, y))
+      continue
     frame = entity["frame"]
     sx = 0
     sy = 0
@@ -486,11 +462,13 @@ def render_entities(image, entities, map_name):
         sy = 32
       else:
         print("WARNING: what Silverfish direction is this: {}".format(frame))
+    elif entity_name == "Pew_Laser":
+      sx = (frame & 3) * 16
     elif entity_name == "Dash_Trap":
       sy = 16
       if is_boi:
         sx = 32
-    elif entity_name in ("Gasguy", "Teleguy"):
+    elif entity_name in ("Gasguy", "Teleguy", "Sun_Guy"):
       height = 24
     elif entity_name == "Slasher":
       width = 24
@@ -538,6 +516,15 @@ def render_entities(image, entities, map_name):
         sy = 16
       if consume_dust_at(x, y):
         sx = 16
+    elif entity_name == "Shadow_Briar":
+      sy = 32
+      if frame in (0, 2, 3, 4):
+        pass # face down
+      elif frame == 1:
+        sx = 64 # face up
+      else:
+        print("WARNING: ignoring Shadow_Briar frame: {}".format(frame))
+        continue
     elif entity_name == "Chaser":
       height = 32
       sy = 32
@@ -559,6 +546,24 @@ def render_entities(image, entities, map_name):
         sy = 64
       else:
         sy = 16
+    elif entity_name in ("Hole", "CrackedTile"):
+      if map_name == "BEDROOM":
+        pass
+      elif map_name == "REDCAVE":
+        sx = 32
+      else:
+        print("WARNING: ignoring {} in map: {}".format(entity_name, map_name))
+        continue
+    elif entity_name == "Dungeon_Statue":
+      width = 32
+      height = 48
+      if map_name == "BEDROOM":
+        pass
+      elif map_name == "REDCAVE":
+        sx = 32
+      elif map_name == "CROWD":
+        sx = 64
+      else: unreachable()
     elif entity_name == "NPC":
       npc_type = entity["type"]
       if npc_type == "Cell_Body":
@@ -579,9 +584,35 @@ def render_entities(image, entities, map_name):
         sprite = sprites["npc_rock"]
         if map_name == "CELL":
           sx = 16
+      elif npc_type == "statue":
+        sprite = sprites["npc_sage_statue"]
+      elif npc_type == "big_key":
+        sprite = sprites["big_key"]
+        if map_name == "BEDROOM":
+          sx = 0
+        elif map_name == "REDCAVE":
+          sx = 16
+        elif map_name == "CROWD":
+          sx = 32
+        else: unreachable()
+      elif npc_type == "generic":
+        if map_name == "BEACH":
+          if frame == 7:
+            # Hews the lobster
+            sprite = sprites["beach_npcs"]
+          elif frame == 16:
+            sprite = sprites["Trade_NPC"]
+            sx = 96
+            sy = 128
+        else:
+          print("WARNING: ignoring generic npc in map: {}".format(map_name))
+          continue
       else:
         print("WARNING: ignoring npc type: {}".format(npc_type))
         continue
+    elif entity_name == "Fisherman":
+      sprite = sprites["beach_npcs"]
+      sy = 16
     elif entity_name == "Health_Cicada":
       if map_name == "CELL":
         sy = 32
@@ -603,12 +634,14 @@ def render_entities(image, entities, map_name):
         sy = 32
     elif entity_name == "Door":
       door_type = entity["type"]
-      if door_type in ("1", "5", "10"):
+      if door_type in ("1", "5", "9", "10", "12", "15"):
         continue # invisible
       elif door_type == "4":
         sprite = sprites["door_portal"]
         if map_name == "CELL":
           sy = 16
+      elif door_type == "7":
+        sprite = sprites["whirlpool"]
       elif door_type == "16":
         sprite = sprites["nexus_pad"]
         width = 32
@@ -618,14 +651,19 @@ def render_entities(image, entities, map_name):
       else:
         print("WARNING: ignoring door type: {}".format(door_type))
         continue
+    elif entity_name == "solid_tile":
+      continue # invisible
     elif entity_name == "Solid_Sprite":
       solid_type = entity["type"]
-      if solid_type == "blocker":
+      if solid_type in "blocker":
         continue # invisible
       else:
         print("WARNING: ignoring Solid_Sprite type: {}".format(solid_type))
         continue
-    elif entity_name in ("Pillar_Switch", "Dog", "Shieldy", "Rotator", "Dust"):
+    elif entity_name in (
+        "Pillar_Switch", "Dog", "Shieldy", "Rotator", "Dust",
+        "Burst_Plant", "Four_Shooter", "Eye_Light",
+      ):
       pass # simple
     elif entity_name in ("Stop_Marker", "Event"):
       continue # invisible
