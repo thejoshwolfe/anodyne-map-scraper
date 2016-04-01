@@ -340,11 +340,6 @@ sprite_paths = {
   "Fire_Pillar": "Anodyne/src/entity/enemy/circus/Fire_Pillar_fire_pillar_base_sprite.png",
   "Sage": "Anodyne/src/entity/interactive/npc/Sage_sage_sprite.png",
   "Mitra": "Anodyne/src/entity/interactive/npc/Mitra_mitra_sprite.png",
-  #"Mitra": [
-  #  "Anodyne/src/entity/interactive/npc/Mitra_mitra_sprite.png",
-  #  "Anodyne/src/entity/interactive/npc/Mitra_bike_sprite.png",
-  #  "Anodyne/src/entity/interactive/npc/Mitra_mitra_on_bike_sprite.png",
-  #],
   "Health_Cicada": "Anodyne/src/entity/interactive/Health_Cicada_health_cicada_embed.png",
   "Dungeon_Statue": "Anodyne/src/entity/interactive/Dungeon_Statue_statue_bedroom_embed.png",
   "Chaser": "Anodyne/src/entity/enemy/etc/Chaser_embed_chaser_sprite.png",
@@ -404,6 +399,7 @@ def load_sprites():
   sprites["wall_boss_hand"] = read_tileset("Anodyne/src/entity/enemy/crowd/WallBoss_l_hand_sprite.png")
   sprites["npc_hotel"] = read_tileset("Anodyne/src/entity/interactive/NPC_embed_hotel_npcs.png")
   sprites["bike"] = read_tileset("Anodyne/src/entity/interactive/npc/Mitra_bike_sprite.png")
+  sprites["mitra_on_bike"] = read_tileset("Anodyne/src/entity/interactive/npc/Mitra_mitra_on_bike_sprite.png")
 
 warning_set = set()
 def render_entities(image, entities, map_name):
@@ -839,8 +835,24 @@ def render_entities(image, entities, map_name):
       if map_name == "FIELDS":
         sy = 16
         draw_mitras_fields_bike = True
+      elif map_name == "CLIFF":
+        sprite = sprites["mitra_on_bike"]
+        sx = 40
+        width = 20
+        height = 20
+        y -= 4
+        # TODO: horizontal flip
       else:
         print("WARNING: default rendering mitra in map: {}".format(map_name))
+    elif entity_name == "Sage":
+      sy = 16
+      if map_name in ("BEDROOM", "REDCAVE", "CROWD", "NEXUS", "TERMINAL"):
+        pass
+      elif map_name == "BLANK":
+        # don't show those two
+        continue
+      else:
+        print("WARNING: default rendering sage in map: {}".format(map_name))
     elif entity_name == "Happy_NPC":
       if frame == 18:
         continue # briar walking along a trough thing
