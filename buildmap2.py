@@ -693,6 +693,11 @@ def render_entities(image, entities, map_name):
         sprite = sprites["npc_rock"]
         if map_name == "CELL":
           sx = 16
+        elif map_name == "SPACE":
+          sprite = sprites["Space_NPC"]
+          sy = 48
+          if x > 912:
+            sx = 16
       elif npc_type == "statue":
         sprite = sprites["npc_sage_statue"]
       elif npc_type == "big_key":
@@ -767,6 +772,18 @@ def render_entities(image, entities, map_name):
           # James
           sprite = sprites["Forest_NPC"]
           sy = 16
+        elif map_name == "SPACE":
+          sprite = sprites["Space_NPC"]
+          if y > 500:
+            # drifter
+            pass
+          else:
+            # kings
+            sy = 64
+            width = 32
+            height = 32
+            if x > 912:
+              sx = 64
         else:
           print("WARNING: ignoring generic npc in map: {}: {}: {},{}".format(map_name, frame, x, y))
           continue
@@ -807,6 +824,17 @@ def render_entities(image, entities, map_name):
         sx = 64
         sy = 48
       else: unreachable()
+    elif entity_name == "Space_NPC":
+      if x > 912:
+        sy = 16
+      if frame in (8, 18):
+        # dead
+        sx = 128
+    elif entity_name == "Space_Face":
+      sprite = sprites["Space_NPC"]
+      sy = 32
+      if x > 912:
+        sx = 32
     elif entity_name == "Mitra":
       if map_name == "FIELDS":
         sy = 16
