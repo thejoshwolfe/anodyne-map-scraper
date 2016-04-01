@@ -403,6 +403,7 @@ def load_sprites():
   sprites["wall_boss_mouth"] = read_tileset("Anodyne/src/entity/enemy/crowd/WallBoss_face_sprite.png")
   sprites["wall_boss_hand"] = read_tileset("Anodyne/src/entity/enemy/crowd/WallBoss_l_hand_sprite.png")
   sprites["npc_hotel"] = read_tileset("Anodyne/src/entity/interactive/NPC_embed_hotel_npcs.png")
+  sprites["bike"] = read_tileset("Anodyne/src/entity/interactive/npc/Mitra_bike_sprite.png")
 
 warning_set = set()
 def render_entities(image, entities, map_name):
@@ -434,6 +435,8 @@ def render_entities(image, entities, map_name):
     height = 16
     sprite = sprites.get(entity_name, None)
     sprite2 = None
+    draw_ranks_bush = False
+    draw_mitras_fields_bike = False
     is_boi = map_name == "REDCAVE" and y > 1000
     if entity_name == "Switch_Pillar":
       sx = frame * 16
@@ -736,6 +739,29 @@ def render_entities(image, entities, map_name):
             sx = 72
             width = 24
             height = 24
+        elif map_name == "FIELDS":
+          sprite = sprites["Trade_NPC"]
+          sy = 128
+          if frame == 8:
+            # Olive the rabbit
+            sprite = sprites["Forest_NPC"]
+            sy = 48
+          elif frame == 13:
+            # Bob the Hamster
+            pass
+          elif frame == 14:
+            # Chikapu
+            sx = 32
+          elif frame == 15:
+            # Kuribu
+            sx = 64
+          elif frame == 7:
+            # Rank
+            sy = 96
+            sx = 32
+            height = 32
+            draw_ranks_bush = True
+          else: unreachable()
         else:
           print("WARNING: ignoring generic npc in map: {}: {}: {},{}".format(map_name, frame, x, y))
           continue
@@ -746,11 +772,26 @@ def render_entities(image, entities, map_name):
       else:
         print("WARNING: ignoring npc type: {}".format(npc_type))
         continue
-    elif entity_name == "Eye_Boss":
-      width = 24
-      height = 24
-      if y == 1648:
-        sy = 24
+    elif entity_name == "Trade_NPC":
+      if frame == 0:
+        # Miao Xiao Tuan Er
+        pass
+      elif frame in (1, 2):
+        # fish
+        sy = 32
+      elif frame == 3:
+        # Finty
+        sy = 80
+      elif frame == 4:
+        # Icky
+        sy = 16
+      else: unreachable()
+    elif entity_name == "Mitra":
+      if map_name == "FIELDS":
+        sy = 16
+        draw_mitras_fields_bike = True
+      else:
+        print("WARNING: default rendering mitra in map: {}".format(map_name))
     elif entity_name == "Happy_NPC":
       if frame == 18:
         continue # briar walking along a trough thing
@@ -767,6 +808,11 @@ def render_entities(image, entities, map_name):
     elif entity_name == "Health_Cicada":
       if map_name == "CELL":
         sy = 32
+    elif entity_name == "Eye_Boss":
+      width = 24
+      height = 24
+      if y == 1648:
+        sy = 24
     elif entity_name == "Annoyer":
       if map_name == "CELL":
         sy = 16
@@ -843,6 +889,11 @@ def render_entities(image, entities, map_name):
       did_anything = True
       if sprite2 != None:
         image.paste(sprite2, sx=sx, sy=sy, dx=x, dy=y, width=width, height=height)
+      elif draw_ranks_bush:
+        # the 12 is not a mistake. this bush is strangly aligned
+        image.paste(sprite, sx=0, sy=48, dx=x+16, dy=y+12, width=16, height=16)
+      elif draw_mitras_fields_bike:
+        image.paste(sprites["bike"], sx=20, sy=0, dx=x-22, dy=y-11, width=20, height=20)
     else:
       if entity_name not in warning_set:
         warning_set.add(entity_name)
