@@ -261,10 +261,7 @@ sprite_paths = {
   "Four_Shooter": "Anodyne/src/entity/enemy/redcave/Four_Shooter_four_shooter_sprite.png",
   "Slasher": "Anodyne/src/entity/enemy/redcave/Slasher_slasher_sprite.png",
   "On_Off_Laser": "Anodyne/src/entity/enemy/redcave/On_Off_Laser_on_off_shooter_sprite.png",
-  "Red_Pillar": [
-    "Anodyne/src/entity/interactive/Red_Pillar_red_pillar_ripple_sprite.png",
-    "Anodyne/src/entity/interactive/Red_Pillar_red_pillar_sprite.png",
-  ],
+  "Red_Pillar": "Anodyne/src/entity/interactive/Red_Pillar_red_pillar_sprite.png",
   "Solid_Sprite": [
     "Anodyne/src/entity/decoration/Solid_Sprite_red_cave_left_sprite.png",
     "Anodyne/src/entity/decoration/Solid_Sprite_trees_sprites.png",
@@ -282,19 +279,9 @@ sprite_paths = {
     "Anodyne/src/entity/interactive/NPC_embed_windmill_blade.png",
     "Anodyne/src/entity/interactive/NPC_embed_randoms.png",
     "Anodyne/src/entity/interactive/NPC_note_rock.png",
-    "Anodyne/src/entity/interactive/NPC_embed_smoke_red.png",
     "Anodyne/src/entity/interactive/NPC_npc_spritesheet.png",
   ],
-  "Red_Boss": [
-    "Anodyne/src/entity/enemy/redcave/Red_Boss_red_boss_sprite.png",
-    "Anodyne/src/entity/enemy/redcave/Red_Boss_ripple_sprite.png",
-    "Anodyne/src/entity/enemy/redcave/Red_Boss_big_wave_sprite.png",
-    "Anodyne/src/entity/enemy/redcave/Red_Boss_bullet_sprite.png",
-    "Anodyne/src/entity/enemy/redcave/Red_Boss_tentacle_sprite.png",
-    "Anodyne/src/entity/enemy/redcave/Red_Boss_red_boss_alternate_sprite.png",
-    "Anodyne/src/entity/enemy/redcave/Red_Boss_small_wave_sprite.png",
-    "Anodyne/src/entity/enemy/redcave/Red_Boss_warning_sprite.png",
-  ],
+  "Red_Boss": "Anodyne/src/entity/enemy/redcave/Red_Boss_red_boss_sprite.png",
   "Propelled": "Anodyne/src/entity/gadget/Propelled_moving_platform_sprite.png",
   "Stop_Marker": "???",
   "Person": "Anodyne/src/entity/enemy/crowd/Person_person_sprite.png",
@@ -400,6 +387,7 @@ def load_sprites():
   sprites["npc_hotel"] = read_tileset("Anodyne/src/entity/interactive/NPC_embed_hotel_npcs.png")
   sprites["bike"] = read_tileset("Anodyne/src/entity/interactive/npc/Mitra_bike_sprite.png")
   sprites["mitra_on_bike"] = read_tileset("Anodyne/src/entity/interactive/npc/Mitra_mitra_on_bike_sprite.png")
+  sprites["smoke_red"] = read_tileset("Anodyne/src/entity/interactive/NPC_embed_smoke_red.png")
 
 warning_set = set()
 def render_entities(image, entities, map_name):
@@ -780,6 +768,10 @@ def render_entities(image, entities, map_name):
             height = 32
             if x > 912:
               sx = 64
+        elif map_name == "REDCAVE":
+          sprite = sprites["smoke_red"]
+          width = 32
+          height = 32
         else:
           print("WARNING: ignoring generic npc in map: {}: {}: {},{}".format(map_name, frame, x, y))
           continue
@@ -842,11 +834,17 @@ def render_entities(image, entities, map_name):
         height = 20
         y -= 4
         # TODO: horizontal flip
+      elif map_name == "OVERWORLD":
+        sprite = sprites["mitra_on_bike"]
+        sx = 40
+        width = 20
+        height = 20
+        y -= 4
       else:
         print("WARNING: default rendering mitra in map: {}".format(map_name))
     elif entity_name == "Sage":
       sy = 16
-      if map_name in ("BEDROOM", "REDCAVE", "CROWD", "NEXUS", "TERMINAL"):
+      if map_name in ("BEDROOM", "REDCAVE", "CROWD", "NEXUS", "TERMINAL", "OVERWORLD"):
         pass
       elif map_name == "BLANK":
         # don't show those two
@@ -874,6 +872,13 @@ def render_entities(image, entities, map_name):
       height = 24
       if y == 1648:
         sy = 24
+    elif entity_name == "Red_Boss":
+      width = 32
+      height = 32
+    elif entity_name == "Red_Pillar":
+      height = 64
+    elif entity_name == "Mover":
+      sx = 16
     elif entity_name == "Annoyer":
       if map_name == "CELL":
         sy = 16
@@ -935,7 +940,7 @@ def render_entities(image, entities, map_name):
         continue
     elif entity_name in (
         "Pillar_Switch", "Dog", "Shieldy", "Rotator", "Dust",
-        "Burst_Plant", "Four_Shooter", "Eye_Light",
+        "Burst_Plant", "Four_Shooter", "Eye_Light", "Sadbro",
       ):
       pass # simple
     elif entity_name == "Stop_Marker":
@@ -988,7 +993,13 @@ def main():
   parser = argparse.ArgumentParser()
   parser.add_argument("map_name", nargs="*")
   parser.add_argument("-s", "--separate", action="store_true")
+  parser.add_argument("-f", "--force", action="store_true")
   args = parser.parse_args()
+
+  valid_map_names = set(mapfile["map_name"] for mapfile in mapfiles)
+  for map_name in args.map_name:
+    if map_name not in valid_map_names:
+      parser.error("unknown map name: {}\nvalid choices: {}".format(map_name, " ".join(valid_map_names)))
 
   # read registry XML file that contains entity information
   objects_by_map_name = read_registry()
@@ -999,8 +1010,13 @@ def main():
 
   for mapfile in mapfiles:
     map_name = mapfile["map_name"]
-    if args.map_name and map_name not in args.map_name:
+    file_name_base = "maps/" + map_name
+    if len(args.map_name) > 0 and map_name not in args.map_name:
       continue
+    if len(args.map_name) == 0 and not args.separate and not args.force:
+      if os.path.exists(file_name_base + ".png"):
+        print("Skipping: " + map_name)
+        continue
     print("Processing: " + map_name)
 
     # build initial map image
@@ -1012,7 +1028,6 @@ def main():
 
     # save images
     # TODO: apply grayscale effect to SUBURB
-    file_name_base = "maps/" + map_name
     if args.separate:
       for i, layer in enumerate(layers):
         if layer == None: continue
