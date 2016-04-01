@@ -275,7 +275,6 @@ sprite_paths = {
   "NPC": [
     "Anodyne/src/entity/interactive/NPC_key_sparkle_embed.png",
     "Anodyne/src/entity/interactive/NPC_embed_trade_npcs.png",
-    "Anodyne/src/entity/interactive/NPC_embed_hotel_npcs.png",
     "Anodyne/src/entity/interactive/NPC_embed_cube_kings.png",
     "Anodyne/src/entity/interactive/NPC_embed_cell_bodies.png",
     "Anodyne/src/entity/interactive/NPC_embed_geoms.png",
@@ -331,11 +330,7 @@ sprite_paths = {
   "Burst_Plant": "Anodyne/src/entity/enemy/hotel/Burst_Plant_burst_plant_sprite.png",
   "Dash_Pad": "Anodyne/src/entity/gadget/Dash_Pad_dash_pad_sprite.png",
   "Elevator": "Anodyne/src/entity/interactive/Elevator_Elevator_Sprite.png",
-  "Eye_Boss": [
-    "Anodyne/src/entity/enemy/hotel/Eye_Boss_eye_boss_water_sprite.png",
-    "Anodyne/src/entity/enemy/hotel/Eye_Boss_eye_boss_bullet_sprite.png",
-    "Anodyne/src/entity/enemy/hotel/Eye_Boss_eye_boss_splash_sprite.png",
-  ],
+  "Eye_Boss": "Anodyne/src/entity/enemy/hotel/Eye_Boss_eye_boss_water_sprite.png",
   "HealthPickup": [
     "Anodyne/src/entity/player/HealthPickup_embed_Big_health.png",
     "Anodyne/src/entity/player/HealthPickup_S_SMALL_HEALTH.png",
@@ -407,6 +402,7 @@ def load_sprites():
   sprites["wall_boss_wall"] = read_tileset("Anodyne/src/entity/enemy/crowd/WallBoss_wall_sprite.png")
   sprites["wall_boss_mouth"] = read_tileset("Anodyne/src/entity/enemy/crowd/WallBoss_face_sprite.png")
   sprites["wall_boss_hand"] = read_tileset("Anodyne/src/entity/enemy/crowd/WallBoss_l_hand_sprite.png")
+  sprites["npc_hotel"] = read_tileset("Anodyne/src/entity/interactive/NPC_embed_hotel_npcs.png")
 
 warning_set = set()
 def render_entities(image, entities, map_name):
@@ -485,7 +481,7 @@ def render_entities(image, entities, map_name):
       height = 32
     elif entity_name == "Contort":
       height = 32
-    elif entity_name == "Lion":
+    elif entity_name in ("Lion", "Elevator"):
       width = 32
       height = 32
     elif entity_name == "Red_Walker":
@@ -649,6 +645,17 @@ def render_entities(image, entities, map_name):
       elif map_name == "CIRCUS":
         sx = 32
         sy = 16
+      elif map_name == "HOTEL":
+        # three different styles depending on what floor we're on
+        quad_x = int(x >= 960)
+        quad_y = int(y >= 800)
+        if (quad_x, quad_y) == (0, 0):
+          sy = 16
+        elif (quad_x, quad_y) == (1, 1):
+          sx = 16
+          sy = 16
+        else:
+          sx = 48
       else:
         print("WARNING: ignoring {} in map: {}".format(entity_name, map_name))
         continue
@@ -719,8 +726,18 @@ def render_entities(image, entities, map_name):
           elif frame == 6:
             sprite = sprites["Dog"]
           else: unreachable()
+        elif map_name == "HOTEL":
+          if frame == 12:
+            sprite = sprites["npc_hotel"]
+            sx = 32
+          elif frame == 5:
+            # spooky eye in the water
+            sprite = sprites["Eye_Boss"]
+            sx = 72
+            width = 24
+            height = 24
         else:
-          print("WARNING: ignoring generic npc in map: {}".format(map_name))
+          print("WARNING: ignoring generic npc in map: {}: {}: {},{}".format(map_name, frame, x, y))
           continue
       elif npc_type == "biofilm":
         sprite = sprites["biofilm"]
@@ -729,6 +746,11 @@ def render_entities(image, entities, map_name):
       else:
         print("WARNING: ignoring npc type: {}".format(npc_type))
         continue
+    elif entity_name == "Eye_Boss":
+      width = 24
+      height = 24
+      if y == 1648:
+        sy = 24
     elif entity_name == "Happy_NPC":
       if frame == 18:
         continue # briar walking along a trough thing
