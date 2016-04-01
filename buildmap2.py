@@ -823,6 +823,9 @@ def render_entities(image, entities, map_name):
       elif frame == 8:
         sx = 32
         sy = 16
+      # for some reason, these enemies always start offset a littl
+      x -= 3
+      y -= 2
     elif entity_name == "Slime":
       if is_boi:
         sx = 32
@@ -831,7 +834,7 @@ def render_entities(image, entities, map_name):
         sy = 32
     elif entity_name == "Door":
       door_type = entity["type"]
-      if door_type in ("1", "5", "6", "8", "9", "10", "11", "12", "14", "15"):
+      if door_type in ("1", "5", "6", "8", "9", "10", "11", "12", "13", "14", "15"):
         continue # invisible
       elif door_type == "4":
         sprite = sprites["door_portal"]
@@ -854,8 +857,20 @@ def render_entities(image, entities, map_name):
       solid_type = entity["type"]
       if solid_type in ("blocker", "vblock"):
         continue # invisible
+      elif solid_type == "sign":
+        sprite = sprites["npc_rock"]
+        if frame == 2:
+          sy = 16
+        elif frame == 3:
+          sx = 16
+          sy = 16
+        elif frame == 4:
+          sy = 32
+        else:
+          print("WARNING: ignoring sign: {}: {},{}".format(frame, x, y))
+          continue
       else:
-        print("WARNING: ignoring Solid_Sprite type: {}".format(solid_type))
+        print("WARNING: ignoring Solid_Sprite type: {}: {}: {},{}".format(solid_type, frame, x, y))
         continue
     elif entity_name in (
         "Pillar_Switch", "Dog", "Shieldy", "Rotator", "Dust",
@@ -928,6 +943,7 @@ def main():
       layers[2] = entity_layer
 
     # save images
+    # TODO: apply grayscale effect to SUBURB
     file_name_base = "maps/" + map_name
     if args.separate:
       for i, layer in enumerate(layers):
