@@ -437,6 +437,7 @@ def render_entities(image, entities, map_name):
     sprite2 = None
     draw_ranks_bush = False
     draw_mitras_fields_bike = False
+    draw_fintys_shop = False
     is_boi = map_name == "REDCAVE" and y > 1000
     if entity_name == "Switch_Pillar":
       sx = frame * 16
@@ -786,6 +787,7 @@ def render_entities(image, entities, map_name):
       elif frame == 3:
         # Finty
         sy = 80
+        draw_fintys_shop = True
       elif frame == 4:
         # Icky
         sy = 16
@@ -928,6 +930,13 @@ def render_entities(image, entities, map_name):
         image.paste(sprite, sx=0, sy=48, dx=x+16, dy=y+12, width=16, height=16)
       elif draw_mitras_fields_bike:
         image.paste(sprites["bike"], sx=20, sy=0, dx=x-22, dy=y-11, width=20, height=20)
+      elif draw_fintys_shop:
+        # gun
+        image.paste(sprites["Trade_NPC"], sx=64, sy=80, dx=x-32, dy=y+32, width=16, height=16)
+        # money sack
+        image.paste(sprites["Trade_NPC"], sx=80, sy=80, dx=x+4, dy=y+32, width=16, height=16)
+        # shoes
+        image.paste(sprites["Trade_NPC"], sx=96, sy=80, dx=x+32+6, dy=y+32, width=16, height=16)
     else:
       if entity_name not in warning_set:
         warning_set.add(entity_name)
