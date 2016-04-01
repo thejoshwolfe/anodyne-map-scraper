@@ -762,6 +762,10 @@ def render_entities(image, entities, map_name):
             height = 32
             draw_ranks_bush = True
           else: unreachable()
+        elif map_name == "FOREST":
+          # James
+          sprite = sprites["Forest_NPC"]
+          sy = 16
         else:
           print("WARNING: ignoring generic npc in map: {}: {}: {},{}".format(map_name, frame, x, y))
           continue
@@ -785,6 +789,21 @@ def render_entities(image, entities, map_name):
       elif frame == 4:
         # Icky
         sy = 16
+      else: unreachable()
+    elif entity_name == "Forest_NPC":
+      if frame == 0:
+        # Thorax
+        sx = 16
+      elif frame == 20:
+        # mushroom
+        sy = 32
+      elif frame == 30:
+        # Crickson
+        sy = 48
+      elif frame == 34:
+        # scared rabit
+        sx = 64
+        sy = 48
       else: unreachable()
     elif entity_name == "Mitra":
       if map_name == "FIELDS":
