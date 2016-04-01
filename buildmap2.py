@@ -388,6 +388,7 @@ def load_sprites():
   sprites["bike"] = read_tileset("Anodyne/src/entity/interactive/npc/Mitra_bike_sprite.png")
   sprites["mitra_on_bike"] = read_tileset("Anodyne/src/entity/interactive/npc/Mitra_mitra_on_bike_sprite.png")
   sprites["smoke_red"] = read_tileset("Anodyne/src/entity/interactive/NPC_embed_smoke_red.png")
+  sprites["red_cave"] = read_tileset("Anodyne/src/entity/decoration/Solid_Sprite_red_cave_left_sprite.png")
 
 warning_set = set()
 def render_entities(image, entities, map_name):
@@ -459,7 +460,7 @@ def render_entities(image, entities, map_name):
       sy = 16
       if is_boi:
         sx = 32
-    elif entity_name in ("Gasguy", "Teleguy", "Sun_Guy", "Dustmaid"):
+    elif entity_name in ("Gasguy", "Teleguy", "Sun_Guy", "Dustmaid", "Follower_Bro"):
       height = 24
     elif entity_name == "Slasher":
       width = 24
@@ -628,6 +629,8 @@ def render_entities(image, entities, map_name):
     elif entity_name in ("Hole", "CrackedTile"):
       if map_name == "BEDROOM":
         pass
+      elif map_name == "STREET":
+        sx = 16
       elif map_name == "REDCAVE":
         sx = 32
       elif map_name == "CIRCUS":
@@ -935,6 +938,10 @@ def render_entities(image, entities, map_name):
         else:
           print("WARNING: ignoring sign: {}: {},{}".format(frame, x, y))
           continue
+      elif solid_type in ("red_cave_n_ss", "red_cave_r_ss", "red_cave_l_ss"):
+        sprite = sprites["red_cave"]
+        width = 64
+        height = 64
       else:
         print("WARNING: ignoring Solid_Sprite type: {}: {}: {},{}".format(solid_type, frame, x, y))
         continue
