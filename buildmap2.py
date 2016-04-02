@@ -343,6 +343,7 @@ sprite_paths = {
   "Black_Thing": "???",
   "Suburb_Walker": "Anodyne/src/entity/enemy/suburb/Suburb_Walker_embed_suburb_folk.png",
   "Suburb_Killer": "Anodyne/src/entity/enemy/suburb/Suburb_Walker_embed_suburb_killer.png",
+  "Key": "Anodyne/src/entity/gadget/Key_C_KEY_SPRITE.png",
 }
 sprites = {}
 def load_sprites():
@@ -382,6 +383,9 @@ def load_sprites():
   sprites["smoke_red"] = read_tileset("Anodyne/src/entity/interactive/NPC_embed_smoke_red.png")
   sprites["red_cave"] = read_tileset("Anodyne/src/entity/decoration/Solid_Sprite_red_cave_left_sprite.png")
   sprites["ground_thorn"] = read_tileset("Anodyne/src/entity/enemy/etc/Briar_Boss_embed_ground_thorn.png")
+  sprites["npc_squiggles"] = read_tileset("Anodyne/src/entity/interactive/NPC_npc_spritesheet.png")
+  sprites["debug_tree"] = read_tileset("Anodyne/src/entity/decoration/Solid_Sprite_trees_sprites.png")
+  sprites["npc_devs"] = read_tileset("Anodyne/src/states/EndingState_embed_dev_npcs.png")
 
 warning_set = set()
 def render_entities(image, entities, map_name):
@@ -466,7 +470,7 @@ def render_entities(image, entities, map_name):
       height = 32
     elif entity_name == "Contort":
       height = 32
-    elif entity_name in ("Lion", "Elevator"):
+    elif entity_name in ("Lion", "Elevator", "Big_Door"):
       width = 32
       height = 32
     elif entity_name == "Red_Walker":
@@ -555,7 +559,7 @@ def render_entities(image, entities, map_name):
       else:
         print("WARNING: what nonsolid type is this: {}".format(nonsolid_type))
     elif entity_name == "Jump_Trigger":
-      if map_name in ("APARTMENT", "CLIFF", "BEACH", "CROWD"):
+      if map_name in ("APARTMENT", "CLIFF", "BEACH", "CROWD", "DEBUG"):
         # jump triggers are invisible in these maps
         continue
       elif map_name == "HOTEL":
@@ -648,6 +652,10 @@ def render_entities(image, entities, map_name):
           sx = 48
       else:
         print("WARNING: ignoring {} in map: {}".format(entity_name, map_name))
+        continue
+    elif entity_name == "Key":
+      if y > 100:
+        # this one's not real, i guess
         continue
     elif entity_name == "Dungeon_Statue":
       width = 32
@@ -793,6 +801,13 @@ def render_entities(image, entities, map_name):
           else: unreachable()
         elif map_name == "SUBURB":
           sprite = sprites["Suburb_Walker"]
+        elif map_name == "DEBUG":
+          sprite = sprites["npc_devs"]
+          if frame == 17:
+            pass
+          elif frame == 18:
+            sy = 16
+          else: unreachable()
         else:
           print("WARNING: ignoring generic npc in map: {}: {}: {},{}".format(map_name, frame, x, y))
           continue
@@ -800,8 +815,11 @@ def render_entities(image, entities, map_name):
         sprite = sprites["biofilm"]
         width = 32
         height = 32
+      elif npc_type == "npc_test":
+        # "like music?" scribbly guy
+        sprite = sprites["npc_squiggles"]
       else:
-        print("WARNING: ignoring npc type: {}".format(npc_type))
+        print("WARNING: ignoring npc type: {}: {}: {},{}".format(npc_type, frame, x, y))
         continue
     elif entity_name == "Trade_NPC":
       if frame == 0:
@@ -988,6 +1006,10 @@ def render_entities(image, entities, map_name):
           continue
       elif solid_type in ("red_cave_n_ss", "red_cave_r_ss", "red_cave_l_ss"):
         sprite = sprites["red_cave"]
+        width = 64
+        height = 64
+      elif solid_type == "tree":
+        sprite = sprites["debug_tree"]
         width = 64
         height = 64
       else:
