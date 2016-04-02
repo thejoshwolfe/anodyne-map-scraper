@@ -425,7 +425,7 @@ def render_entities(image, entities, map_name):
     flip_h = False
     rotate = 0
     if entity_name == "Switch_Pillar":
-      sx = frame * 16
+      sx = (1 - frame) * 16
     elif entity_name == "Silverfish":
       sy = 16
       if frame == 0: # left
