@@ -332,12 +332,7 @@ sprite_paths = {
   "Chaser": "Anodyne/src/entity/enemy/etc/Chaser_embed_chaser_sprite.png",
   "Space_Face": "???",
   "Go_Detector": "???",
-  "Sage_Boss": [
-    "Anodyne/src/entity/enemy/etc/Sage_Boss_embed_sage_attacks.png",
-    "Anodyne/src/entity/enemy/etc/Sage_Boss_embed_long_dust.png",
-    "Anodyne/src/entity/enemy/etc/Sage_Boss_embed_sage_boss.png",
-    "Anodyne/src/entity/enemy/etc/Sage_Boss_embed_sage_long_attacks.png",
-  ],
+  "Sage_Boss": "Anodyne/src/entity/enemy/etc/Sage_Boss_embed_sage_boss.png",
   "Shadow_Briar": "Anodyne/src/entity/interactive/npc/Shadow_Briar_embed_briar.png",
   "Trade_NPC": "Anodyne/src/entity/interactive/npc/Trade_NPC_embed_dame_trade_npc.png",
   "Forest_NPC": "Anodyne/src/entity/interactive/npc/Forest_NPC_embed_forest_npcs.png",
@@ -389,6 +384,7 @@ def load_sprites():
   sprites["mitra_on_bike"] = read_tileset("Anodyne/src/entity/interactive/npc/Mitra_mitra_on_bike_sprite.png")
   sprites["smoke_red"] = read_tileset("Anodyne/src/entity/interactive/NPC_embed_smoke_red.png")
   sprites["red_cave"] = read_tileset("Anodyne/src/entity/decoration/Solid_Sprite_red_cave_left_sprite.png")
+  sprites["ground_thorn"] = read_tileset("Anodyne/src/entity/enemy/etc/Briar_Boss_embed_ground_thorn.png")
 
 warning_set = set()
 def render_entities(image, entities, map_name):
@@ -582,6 +578,9 @@ def render_entities(image, entities, map_name):
         sx = 16
     elif entity_name == "Shadow_Briar":
       sy = 32
+      if map_name == "GO":
+        # don't bother with this one
+        continue
       if frame in (0, 2, 3, 4):
         pass # face down
       elif frame == 1:
@@ -685,6 +684,9 @@ def render_entities(image, entities, map_name):
           sy = 48
           if x > 912:
             sx = 16
+        elif map_name == "GO":
+          # there's a bunch of garbage rocks off screen in GO
+          continue
       elif npc_type == "statue":
         sprite = sprites["npc_sage_statue"]
       elif npc_type == "big_key":
@@ -775,6 +777,17 @@ def render_entities(image, entities, map_name):
           sprite = sprites["smoke_red"]
           width = 32
           height = 32
+        elif map_name == "GO":
+          if frame == 7:
+            # rock in the super bright room
+            sprite = sprites["npc_rock"]
+          elif frame == 11:
+            # trafic cone blocking HAPPY
+            sprite = sprites["ground_thorn"]
+            sx = 48
+            sy = 16
+            y += 8
+          else: unreachable()
         else:
           print("WARNING: ignoring generic npc in map: {}: {}: {},{}".format(map_name, frame, x, y))
           continue
@@ -843,11 +856,14 @@ def render_entities(image, entities, map_name):
         width = 20
         height = 20
         y -= 4
+      elif map_name == "GO":
+        # there's no good place to show mitra in GO
+        continue
       else:
         print("WARNING: default rendering mitra in map: {}".format(map_name))
     elif entity_name == "Sage":
       sy = 16
-      if map_name in ("BEDROOM", "REDCAVE", "CROWD", "NEXUS", "TERMINAL", "OVERWORLD"):
+      if map_name in ("BEDROOM", "REDCAVE", "CROWD", "NEXUS", "TERMINAL", "OVERWORLD", "GO"):
         pass
       elif map_name == "BLANK":
         # don't show those two
@@ -878,6 +894,10 @@ def render_entities(image, entities, map_name):
     elif entity_name == "Red_Boss":
       width = 32
       height = 32
+    elif entity_name == "Sage_Boss":
+      height = 24
+      # what are you doing over there?
+      x += 24
     elif entity_name == "Red_Pillar":
       height = 64
     elif entity_name == "Mover":
@@ -920,7 +940,7 @@ def render_entities(image, entities, map_name):
       else:
         print("WARNING: ignoring door type: {}".format(door_type))
         continue
-    elif entity_name in ("solid_tile", "Water_Anim"):
+    elif entity_name in ("solid_tile", "Water_Anim", "Go_Detector"):
       continue # invisible
     elif entity_name == "Solid_Sprite":
       solid_type = entity["type"]
@@ -993,6 +1013,12 @@ def render_entities(image, entities, map_name):
       if entity_name not in warning_set:
         warning_set.add(entity_name)
         print("WARNING: ignoring entity: {}".format(entity_name))
+
+  if map_name == "GO":
+    # instructions rock for tile swapping puzzle
+    image.paste(sprites["npc_rock"], dx=352, dy=496, width=16, height=16)
+    did_anything = True
+
   return did_anything
 
 def main():
