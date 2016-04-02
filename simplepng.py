@@ -79,11 +79,17 @@ class ImageBuffer:
     self.data[y * self.width + x] = value
   def at(self, x, y):
     return self.data[y * self.width + x]
-  def paste(self, other, sx=0, sy=0, dx=0, dy=0, width=None, height=None):
+  def paste(self, other, sx=0, sy=0, dx=0, dy=0, width=None, height=None, flip_h=False, rotate=0):
     if width == None:
       width = min(self.width - dx, other.width - sx)
     if height == None:
       height = min(self.height - dy, other.height - sy)
+    if flip_h or rotate != 0:
+      other = other.copy(sx=sx, sy=sy, width=width, height=height)
+      sx = 0
+      sy = 0
+      if flip_h: other.flip_h()
+      if rotate != 0: other.rotate(rotate)
     for y in range(height):
       for x in range(width):
         value = other.at(sx + x, sy + y)
@@ -93,6 +99,37 @@ class ImageBuffer:
         if alpha < 255:
           value = alpha_blend(value, self.at(dx + x, dy + y))
         self.set(dx + x, dy + y, value)
+  def copy(self, sx=0, sy=0, width=None, height=None):
+    if width == None: width = self.width
+    if height == None: height = self.height
+    other = ImageBuffer(width, height)
+    for y in range(height):
+      for x in range(width):
+        other.set(x, y, self.at(x + sx, y + sy))
+    return other
+  def flip_h(self):
+    for y in range(self.height):
+      for x in range(self.width // 2):
+        x2 = self.width - 1 - x
+        tmp = self.at(x, y)
+        self.set(x, y, self.at(x2, y))
+        self.set(x2, y, tmp)
+  def rotate(self, quarter_turns):
+    for y in range(self.height // 2):
+      y2 = self.height - 1 - y
+      for x in range(self.width // 2):
+        x2 = self.width - 1 - x
+        tmp = self.at(x, y)
+        if quarter_turns == 1:
+          self.set(x, y, self.at(y, x2))
+          self.set(y, x2, self.at(x2, y2))
+          self.set(x2, y2, self.at(y2, x))
+          self.set(y2, x, tmp)
+        elif quarter_turns == -1:
+          self.set(x, y, self.at(y2, x))
+          self.set(y2, x, self.at(x2, y2))
+          self.set(x2, y2, self.at(y, x2))
+          self.set(y, x2, tmp)
 
 def add_bytes(a, b):
   return (

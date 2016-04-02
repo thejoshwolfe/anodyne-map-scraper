@@ -341,11 +341,8 @@ sprite_paths = {
   "Space_NPC": "Anodyne/src/entity/interactive/npc/Space_NPC_embed_space_npc.png",
   "Huge_Fucking_Stag": "Anodyne/src/entity/interactive/npc/Huge_Fucking_Stag_embed_stag.png",
   "Black_Thing": "???",
-  "Suburb_Walker": [
-    "Anodyne/src/entity/enemy/suburb/Suburb_Walker_embed_suburb_walker.png",
-    "Anodyne/src/entity/enemy/suburb/Suburb_Walker_embed_suburb_folk.png",
-    "Anodyne/src/entity/enemy/suburb/Suburb_Walker_embed_suburb_killer.png",
-  ],
+  "Suburb_Walker": "Anodyne/src/entity/enemy/suburb/Suburb_Walker_embed_suburb_folk.png",
+  "Suburb_Killer": "Anodyne/src/entity/enemy/suburb/Suburb_Walker_embed_suburb_killer.png",
 }
 sprites = {}
 def load_sprites():
@@ -419,7 +416,10 @@ def render_entities(image, entities, map_name):
     draw_ranks_bush = False
     draw_mitras_fields_bike = False
     draw_fintys_shop = False
+    draw_noose = False
     is_boi = map_name == "REDCAVE" and y > 1000
+    flip_h = False
+    rotate = 0
     if entity_name == "Switch_Pillar":
       sx = frame * 16
     elif entity_name == "Silverfish":
@@ -427,7 +427,7 @@ def render_entities(image, entities, map_name):
       if frame == 0: # left
         sx = 32
         sy = 16
-        # TODO: horizontal flip
+        flip_h = True
       elif frame == 1: # down
         sy = 16
       elif frame == 2: # right
@@ -440,16 +440,16 @@ def render_entities(image, entities, map_name):
     elif entity_name in ("Pew_Laser", "Steam_Pipe"):
       sx = (frame & 3) * 16
     elif entity_name == "On_Off_Laser":
-      if frame == 0:
-        sy = 16 # up
-      elif frame == 1:
-        pass # right
-        # TODO: rotate left
-      elif frame == 2:
-        pass # down
-      elif frame == 3:
-        pass # left
-        # TODO: rotate right
+      if frame == 0: # up
+        sy = 16
+      elif frame == 1: # right
+        # rotate left
+        rotate = -1
+      elif frame == 2: # down
+        pass
+      elif frame == 3: # left
+        # rotate right
+        rotate = 1
       else:
         print("WARNING: what On_Off_Laser direction is this: {}".format(frame))
     elif entity_name == "Dash_Trap":
@@ -713,7 +713,10 @@ def render_entities(image, entities, map_name):
         elif map_name == "BLUE":
           sprite = sprites["npc_snowman"]
         elif map_name == "HAPPY":
-          # invisible NPC that talks to you at the save point
+          # invisible NPC that talks to you at the save point.
+          continue
+        elif map_name == "DRAWER":
+          # trigger for dimming the screen as you leave the game over area.
           continue
         elif map_name == "CELL":
           sprite = sprites["npc_cell_bodies"]
@@ -788,6 +791,8 @@ def render_entities(image, entities, map_name):
             sy = 16
             y += 8
           else: unreachable()
+        elif map_name == "SUBURB":
+          sprite = sprites["Suburb_Walker"]
         else:
           print("WARNING: ignoring generic npc in map: {}: {}: {},{}".format(map_name, frame, x, y))
           continue
@@ -839,6 +844,29 @@ def render_entities(image, entities, map_name):
       sy = 32
       if x > 912:
         sx = 32
+    elif entity_name == "Suburb_Walker":
+      if frame < 6:
+        sy = frame * 16
+      elif (x, y) == (192, 848):
+        sy = 0
+      elif (x, y) == (544, 848):
+        sy = 64
+      elif (x, y) == (688, 848):
+        sy = 32
+      elif (x, y) == (32, 1008):
+        sy = 0
+      elif (x, y) == (192, 1008):
+        sy = 96
+        draw_noose = True
+      elif (x, y) == (592, 896):
+        sy = 16
+      elif (x, y) == (96, 1216):
+        sx = 128
+        sy = 16
+      elif (x, y) == (272, 1216):
+        sx = 128
+        sy = 0
+      else: unreachable()
     elif entity_name == "Mitra":
       if map_name == "FIELDS":
         sy = 16
@@ -849,7 +877,7 @@ def render_entities(image, entities, map_name):
         width = 20
         height = 20
         y -= 4
-        # TODO: horizontal flip
+        flip_h = True
       elif map_name == "OVERWORLD":
         sprite = sprites["mitra_on_bike"]
         sx = 40
@@ -967,7 +995,7 @@ def render_entities(image, entities, map_name):
         continue
     elif entity_name in (
         "Pillar_Switch", "Dog", "Shieldy", "Rotator", "Dust",
-        "Burst_Plant", "Four_Shooter", "Eye_Light", "Sadbro",
+        "Burst_Plant", "Four_Shooter", "Eye_Light", "Sadbro", "Suburb_Killer"
       ):
       pass # simple
     elif entity_name == "Stop_Marker":
@@ -989,11 +1017,10 @@ def render_entities(image, entities, map_name):
       image.paste(sprites["wall_boss_wall"], dx=1440, dy=960, width=160, height=32)
       image.paste(sprites["wall_boss_mouth"], sx=16, dx=1504, dy=960, width=32, height=32)
       image.paste(sprites["wall_boss_hand"], dx=1456, dy=992, width=32, height=32)
-      # TODO: horizontal flip
-      image.paste(sprites["wall_boss_hand"], dx=1552, dy=992, width=32, height=32)
+      image.paste(sprites["wall_boss_hand"], dx=1552, dy=992, width=32, height=32, flip_h=True)
       did_anything = True
     elif sprite != None:
-      image.paste(sprite, sx=sx, sy=sy, dx=x, dy=y, width=width, height=height)
+      image.paste(sprite, sx=sx, sy=sy, dx=x, dy=y, width=width, height=height, flip_h=flip_h, rotate=rotate)
       did_anything = True
       if sprite2 != None:
         image.paste(sprite2, sx=sx, sy=sy, dx=x, dy=y, width=width, height=height)
@@ -1009,6 +1036,9 @@ def render_entities(image, entities, map_name):
         image.paste(sprites["Trade_NPC"], sx=80, sy=80, dx=x+4, dy=y+32, width=16, height=16)
         # shoes
         image.paste(sprites["Trade_NPC"], sx=96, sy=80, dx=x+32+6, dy=y+32, width=16, height=16)
+      elif draw_noose:
+        for i in range(1, 4):
+          image.paste(sprite, sx=16, sy=96, dx=x, dy=y-16*i, width=16, height=16)
     else:
       if entity_name not in warning_set:
         warning_set.add(entity_name)
@@ -1020,6 +1050,19 @@ def render_entities(image, entities, map_name):
     did_anything = True
 
   return did_anything
+
+def grayscale(v):
+  gray = (
+    ((v >> 24) & 0xff) +
+    ((v >> 16) & 0xff) +
+    ((v >>  8) & 0xff)
+  ) // 3
+  return (
+    (gray << 24) |
+    (gray << 16) |
+    (gray <<  8) |
+    (v & 0xff)
+  )
 
 def main():
   import argparse
@@ -1059,8 +1102,14 @@ def main():
     if render_entities(entity_layer, objects_by_map_name[map_name], map_name):
       layers[2] = entity_layer
 
+    # apply grayscale effect to SUBURB
+    if map_name == "SUBURB":
+      for layer in layers:
+        if layer == None: continue
+        for i in range(len(layer.data)):
+          layer.data[i] = grayscale(layer.data[i])
+
     # save images
-    # TODO: apply grayscale effect to SUBURB
     if args.separate:
       for i, layer in enumerate(layers):
         if layer == None: continue
