@@ -38,6 +38,21 @@ def read_tileset(filename, fade=False):
       image.data[i] &= 0xffffff7f
   return image
 
+def paint_physics(image, layer, physics_palette):
+  y_blocks = len(layer)
+  x_blocks = len(layer[0])
+  for y in range(y_blocks):
+    for x in range(x_blocks):
+      tile_index = int(layer[y][x])
+      try:
+        char_code = physics_palette[tile_index]
+      except IndexError:
+        char_code = physics_palette[0]
+      output_tile_index = physics_tileset_char_codes.index(char_code)
+      tile_y = output_tile_index // (physics_tileset.width // 16)
+      tile_x = output_tile_index % (physics_tileset.width // 16)
+      image.paste(physics_tileset, sx=tile_x*16, sy=tile_y*16, dx=x*16, dy=y*16, width=16, height=16)
+
 def paint_with_layer(image, layer, tileset):
   y_blocks = len(layer)
   x_blocks = len(layer[0])
@@ -53,20 +68,25 @@ def paint_with_layer(image, layer, tileset):
   return found_anything
 
 
-def generate_map_image(map):
+def generate_map_image(mapfile, physics_only=False):
   layer_images = [None, None, None, None]
-  tileset = read_tileset(map["tileset"])
+  tileset = read_tileset(mapfile["tileset"])
   width = None
   height = None
-  for i, layerfile in enumerate(map["layers"]):
+  for i, layerfile in enumerate(mapfile["layers"]):
     layer = read_layer(layerfile)
     if width == None:
       width = len(layer[0]) * 16
       height = len(layer) * 16
     image = simplepng.ImageBuffer(width, height)
-    if paint_with_layer(image, layer, tileset):
-      if i == 2: i = 3 # leave space for the entities layer
-      layer_images[i] = image
+    if physics_only:
+      paint_physics(image, layer, mapfile["physics"])
+      layer_images[0] = image
+      break
+    else:
+      if paint_with_layer(image, layer, tileset):
+        if i == 2: i = 3 # leave space for the entities layer
+        layer_images[i] = image
   return layer_images
 
 class RegistryHandler(sax.ContentHandler):
@@ -106,129 +126,134 @@ mapfiles = [
   {
     "map_name": "APARTMENT",
     "tileset": "Anodyne/src/data/TileData__Apartment_Tiles.png",
-    "layers": ["Anodyne/src/data/CSV_Data_APARTMENT_BG.dat", "Anodyne/src/data/CSV_Data_APARTMENT_BG2.dat", "Anodyne/src/data/CSV_Data_APARTMENT_FG.dat"]
+    "layers": ["Anodyne/src/data/CSV_Data_APARTMENT_BG.dat", "Anodyne/src/data/CSV_Data_APARTMENT_BG2.dat", "Anodyne/src/data/CSV_Data_APARTMENT_FG.dat"],
   },
   {
     "map_name": "BEACH",
     "tileset": "Anodyne/src/data/TileData__Beach_Tiles.png",
-    "layers": ["Anodyne/src/data/CSV_Data_BEACH_BG.dat"]
+    "layers": ["Anodyne/src/data/CSV_Data_BEACH_BG.dat"],
   },
   {
     "map_name": "BEDROOM",
     "tileset": "Anodyne/src/data/TileData__Bedroom_Tiles.png",
-    "layers": ["Anodyne/src/data/CSV_Data_BEDROOM_BG.dat"]
+    "layers": ["Anodyne/src/data/CSV_Data_BEDROOM_BG.dat"],
   },
   {
     "map_name": "BLANK",
     "tileset": "Anodyne/src/data/TileData_Blank_Tiles.png",
-    "layers": ["Anodyne/src/data/CSV_Data_BLANK_BG.dat"]
+    "layers": ["Anodyne/src/data/CSV_Data_BLANK_BG.dat"],
   },
   {
     "map_name": "BLUE",
     "tileset": "Anodyne/src/data/TileData_Blue_Tiles.png",
-    "layers": ["Anodyne/src/data/CSV_Data_BLUE_BG.dat", "Anodyne/src/data/CSV_Data_BLUE_BG2.dat"]
+    "layers": ["Anodyne/src/data/CSV_Data_BLUE_BG.dat", "Anodyne/src/data/CSV_Data_BLUE_BG2.dat"],
   },
   {
     "map_name": "CELL",
     "tileset": "Anodyne/src/data/TileData_Cell_Tiles.png",
-    "layers": ["Anodyne/src/data/CSV_Data_CELL_BG.dat"]
+    "layers": ["Anodyne/src/data/CSV_Data_CELL_BG.dat"],
   },
   {
     "map_name": "CIRCUS",
     "tileset": "Anodyne/src/data/TileData__Circus_Tiles.png",
-    "layers": ["Anodyne/src/data/CSV_Data_CIRCUS_BG.dat", "Anodyne/src/data/CSV_Data_CIRCUS_FG.dat"]
+    "layers": ["Anodyne/src/data/CSV_Data_CIRCUS_BG.dat", "Anodyne/src/data/CSV_Data_CIRCUS_FG.dat"],
   },
   {
     "map_name": "CLIFF",
     "tileset": "Anodyne/src/data/TileData_Cliff_Tiles.png",
-    "layers": ["Anodyne/src/data/CSV_Data_CLIFF_BG.dat", "Anodyne/src/data/CSV_Data_CLIFF_BG2.dat"]
+    "layers": ["Anodyne/src/data/CSV_Data_CLIFF_BG.dat", "Anodyne/src/data/CSV_Data_CLIFF_BG2.dat"],
   },
   {
     "map_name": "CROWD",
     "tileset": "Anodyne/src/data/TileData__Crowd_Tiles.png",
-    "layers": ["Anodyne/src/data/CSV_Data_CROWD_BG.dat", "Anodyne/src/data/CSV_Data_CROWD_BG2.dat"]
+    "layers": ["Anodyne/src/data/CSV_Data_CROWD_BG.dat", "Anodyne/src/data/CSV_Data_CROWD_BG2.dat"],
   },
   {
     "map_name": "DEBUG",
     "tileset": "Anodyne/src/data/TileData_Debug_Tiles.png",
-    "layers": ["Anodyne/src/data/CSV_Data_DEBUG_BG.dat", "Anodyne/src/data/CSV_Data_DEBUG_BG2.dat", "Anodyne/src/data/CSV_Data_DEBUG_FG.dat"]
+    "layers": ["Anodyne/src/data/CSV_Data_DEBUG_BG.dat", "Anodyne/src/data/CSV_Data_DEBUG_BG2.dat", "Anodyne/src/data/CSV_Data_DEBUG_FG.dat"],
   },
   {
     "map_name": "DRAWER",
     "tileset": "Anodyne/src/data/TileData_BlackWhite_Tiles.png",
-    "layers": ["Anodyne/src/data/CSV_Data_DRAWER_BG.dat"]
+    "layers": ["Anodyne/src/data/CSV_Data_DRAWER_BG.dat"],
   },
   {
     "map_name": "FIELDS",
     "tileset": "Anodyne/src/data/TileData__Fields_Tiles.png",
-    "layers": ["Anodyne/src/data/CSV_Data_FIELDS_BG.dat", "Anodyne/src/data/CSV_Data_FIELDS_FG.dat"]
+    "layers": ["Anodyne/src/data/CSV_Data_FIELDS_BG.dat", "Anodyne/src/data/CSV_Data_FIELDS_FG.dat"],
   },
   {
     "map_name": "FOREST",
     "tileset": "Anodyne/src/data/TileData_Forest_Tiles.png",
-    "layers": ["Anodyne/src/data/CSV_Data_FOREST_BG.dat", "Anodyne/src/data/CSV_Data_FOREST_BG2.dat", "Anodyne/src/data/CSV_Data_FOREST_FG.dat"]
+    "layers": ["Anodyne/src/data/CSV_Data_FOREST_BG.dat", "Anodyne/src/data/CSV_Data_FOREST_BG2.dat", "Anodyne/src/data/CSV_Data_FOREST_FG.dat"],
   },
   {
     "map_name": "GO",
     "tileset": "Anodyne/src/data/TileData_Go_Tiles.png",
-    "layers": ["Anodyne/src/data/CSV_Data_GO_BG.dat", "Anodyne/src/data/CSV_Data_GO_BG2.dat"]
+    "layers": ["Anodyne/src/data/CSV_Data_GO_BG.dat", "Anodyne/src/data/CSV_Data_GO_BG2.dat"],
   },
   {
     "map_name": "HAPPY",
     "tileset": "Anodyne/src/data/TileData_Happy_Tiles.png",
-    "layers": ["Anodyne/src/data/CSV_Data_HAPPY_BG.dat", "Anodyne/src/data/CSV_Data_HAPPY_BG2.dat"]
+    "layers": ["Anodyne/src/data/CSV_Data_HAPPY_BG.dat", "Anodyne/src/data/CSV_Data_HAPPY_BG2.dat"],
   },
   {
     "map_name": "HOTEL",
     "tileset": "Anodyne/src/data/TileData__Hotel_Tiles.png",
-    "layers": ["Anodyne/src/data/CSV_Data_HOTEL_BG.dat", "Anodyne/src/data/CSV_Data_HOTEL_BG2.dat", "Anodyne/src/data/CSV_Data_HOTEL_FG.dat"]
+    "layers": ["Anodyne/src/data/CSV_Data_HOTEL_BG.dat", "Anodyne/src/data/CSV_Data_HOTEL_BG2.dat", "Anodyne/src/data/CSV_Data_HOTEL_FG.dat"],
   },
   {
     "map_name": "NEXUS",
     "tileset": "Anodyne/src/data/TileData__Nexus_Tiles.png",
-    "layers": ["Anodyne/src/data/CSV_Data_NEXUS_BG.dat", "Anodyne/src/data/CSV_Data_NEXUS_FG.dat"]
+    "layers": ["Anodyne/src/data/CSV_Data_NEXUS_BG.dat", "Anodyne/src/data/CSV_Data_NEXUS_FG.dat"],
   },
   {
     "map_name": "OVERWORLD",
     "tileset": "Anodyne/src/data/TileData__Overworld_Tiles.png",
-    "layers": ["Anodyne/src/data/CSV_Data_OVERWORLD_BG.dat", "Anodyne/src/data/CSV_Data_OVERWORLD_BG2.dat"]
+    "layers": ["Anodyne/src/data/CSV_Data_OVERWORLD_BG.dat", "Anodyne/src/data/CSV_Data_OVERWORLD_BG2.dat"],
   },
   {
     "map_name": "REDCAVE",
     "tileset": "Anodyne/src/data/TileData_REDCAVE_Tiles.png",
-    "layers": ["Anodyne/src/data/CSV_Data_REDCAVE_BG.dat", "Anodyne/src/data/CSV_Data_REDCAVE_BG2.dat"]
+    "layers": ["Anodyne/src/data/CSV_Data_REDCAVE_BG.dat", "Anodyne/src/data/CSV_Data_REDCAVE_BG2.dat"],
   },
   {
     "map_name": "REDSEA",
     "tileset": "Anodyne/src/data/TileData_Red_Sea_Tiles.png",
-    "layers": ["Anodyne/src/data/CSV_Data_REDSEA_BG.dat", "Anodyne/src/data/CSV_Data_REDSEA_FG.dat"]
+    "layers": ["Anodyne/src/data/CSV_Data_REDSEA_BG.dat", "Anodyne/src/data/CSV_Data_REDSEA_FG.dat"],
   },
   {
     "map_name": "SPACE",
     "tileset": "Anodyne/src/data/TileData_Space_Tiles.png",
-    "layers": ["Anodyne/src/data/CSV_Data_SPACE_BG.dat", "Anodyne/src/data/CSV_Data_SPACE_BG2.dat", "Anodyne/src/data/CSV_Data_SPACE_FG.dat"]
+    "layers": ["Anodyne/src/data/CSV_Data_SPACE_BG.dat", "Anodyne/src/data/CSV_Data_SPACE_BG2.dat", "Anodyne/src/data/CSV_Data_SPACE_FG.dat"],
+    "physics": " ########### ############ ######################################################                              llllllllll ",
   },
   {
     "map_name": "STREET",
     "tileset": "Anodyne/src/data/TileData__Street_Tiles.png",
-    "layers": ["Anodyne/src/data/CSV_Data_STREET_BG.dat", "Anodyne/src/data/CSV_Data_STREET_BG2.dat", "Anodyne/src/data/CSV_Data_STREET_FG.dat"]
+    "layers": ["Anodyne/src/data/CSV_Data_STREET_BG.dat", "Anodyne/src/data/CSV_Data_STREET_BG2.dat", "Anodyne/src/data/CSV_Data_STREET_FG.dat"],
   },
   {
     "map_name": "SUBURB",
     "tileset": "Anodyne/src/data/TileData_Suburb_Tiles.png",
-    "layers": ["Anodyne/src/data/CSV_Data_SUBURB_BG.dat"]
+    "layers": ["Anodyne/src/data/CSV_Data_SUBURB_BG.dat"],
   },
   {
     "map_name": "TERMINAL",
     "tileset": "Anodyne/src/data/TileData_Terminal_Tiles.png",
-    "layers": ["Anodyne/src/data/CSV_Data_TERMINAL_BG.dat", "Anodyne/src/data/CSV_Data_TERMINAL_BG2.dat"]
+    "layers": ["Anodyne/src/data/CSV_Data_TERMINAL_BG.dat", "Anodyne/src/data/CSV_Data_TERMINAL_BG2.dat"],
   },
   {
     "map_name": "WINDMILL",
     "tileset": "Anodyne/src/data/TileData__Windmill_Tiles.png",
-    "layers": ["Anodyne/src/data/CSV_Data_WINDMILL_BG.dat", "Anodyne/src/data/CSV_Data_WINDMILL_BG2.dat"]
+    "layers": ["Anodyne/src/data/CSV_Data_WINDMILL_BG.dat", "Anodyne/src/data/CSV_Data_WINDMILL_BG2.dat"],
   }
 ]
+
+physics_tileset_path = "physics_tiles.png"
+physics_tileset = None
+physics_tileset_char_codes = " #l"
 
 sprite_paths = {
   "Slime": "Anodyne/src/entity/enemy/bedroom/Slime_Slime_Sprite.png",
@@ -386,9 +411,14 @@ def load_sprites():
   sprites["npc_squiggles"] = read_tileset("Anodyne/src/entity/interactive/NPC_npc_spritesheet.png")
   sprites["debug_tree"] = read_tileset("Anodyne/src/entity/decoration/Solid_Sprite_trees_sprites.png")
   sprites["npc_devs"] = read_tileset("Anodyne/src/states/EndingState_embed_dev_npcs.png")
+  global physics_tileset
+  physics_tileset = read_tileset(physics_tileset_path)
 
 warning_set = set()
-def render_entities(image, entities, map_name):
+def render_entities(image, entities, map_name, physics_only=False):
+  if physics_only:
+    # TODO: handle entity physics
+    return False
   did_anything = False
 
   # get all the Dust first, since it can go away to fule a Propelled
@@ -1092,6 +1122,7 @@ def main():
   parser.add_argument("map_name", nargs="*")
   parser.add_argument("-s", "--separate", action="store_true")
   parser.add_argument("-f", "--force", action="store_true")
+  parser.add_argument("-p", "--physics", action="store_true")
   args = parser.parse_args()
 
   valid_map_names = set(mapfile["map_name"] for mapfile in mapfiles)
@@ -1111,21 +1142,24 @@ def main():
     file_name_base = "maps/" + map_name
     if len(args.map_name) > 0 and map_name not in args.map_name:
       continue
-    if len(args.map_name) == 0 and not args.separate and not args.force:
+    if len(args.map_name) == 0 and not args.separate and not args.force and not args.physics:
       if os.path.exists(file_name_base + ".png"):
         print("Skipping: " + map_name)
         continue
     print("Processing: " + map_name)
 
+    if args.physics:
+      file_name_base += "_p"
+
     # build initial map image
-    layers = generate_map_image(mapfile)
+    layers = generate_map_image(mapfile, physics_only=args.physics)
     # draw the supported entities on the maps
     entity_layer = simplepng.ImageBuffer(layers[0].width, layers[0].height)
-    if render_entities(entity_layer, objects_by_map_name[map_name], map_name):
+    if render_entities(entity_layer, objects_by_map_name[map_name], map_name, physics_only=args.physics):
       layers[2] = entity_layer
 
     # apply grayscale effect to SUBURB
-    if map_name == "SUBURB":
+    if map_name == "SUBURB" and not args.physics:
       for layer in layers:
         if layer == None: continue
         for i in range(len(layer.data)):
