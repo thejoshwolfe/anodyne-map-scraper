@@ -38,24 +38,37 @@ def read_tileset(filename, fade=False):
       image.data[i] &= 0xffffff7f
   return image
 
-def paint_physics(image, layer, physics_palette):
-  y_blocks = len(layer)
-  x_blocks = len(layer[0])
+def paint_physics(image, layer, physics_palette, layer_index):
+  x_blocks = image.width // 16
+  y_blocks = image.height // 16
+  found_anything = False
   for y in range(y_blocks):
     for x in range(x_blocks):
       tile_index = int(layer[y][x])
-      try:
-        char_code = physics_palette[tile_index]
-      except IndexError:
-        char_code = physics_palette[0]
+      if layer_index != 0 and tile_index == 0:
+        # in GO, GB1 tile 0 is solid, but GB2 tile 0 is open.
+        char_code = " "
+      else:
+        try:
+          char_code = physics_palette[tile_index]
+        except IndexError:
+          char_code = "#"
+      if layer_index != 0 and char_code == "h":
+        # these tiles in BG2 don't seem to matter
+        continue
+      if layer_index != 0 and char_code == " ":
+        # this is typical for upper layers
+        continue
+      found_anything = True
       output_tile_index = physics_tileset_char_codes.index(char_code)
       tile_y = output_tile_index // (physics_tileset.width // 16)
       tile_x = output_tile_index % (physics_tileset.width // 16)
       image.paste(physics_tileset, sx=tile_x*16, sy=tile_y*16, dx=x*16, dy=y*16, width=16, height=16)
+  return found_anything
 
 def paint_with_layer(image, layer, tileset):
-  y_blocks = len(layer)
-  x_blocks = len(layer[0])
+  x_blocks = image.width // 16
+  y_blocks = image.height // 16
   found_anything = False
   for y in range(y_blocks):
     for x in range(x_blocks):
@@ -74,18 +87,17 @@ def generate_map_image(mapfile, physics_only=False):
   width = None
   height = None
   for i, layerfile in enumerate(mapfile["layers"]):
+    if i == 2: i = 3 # leave space for the entities layer
     layer = read_layer(layerfile)
     if width == None:
       width = len(layer[0]) * 16
       height = len(layer) * 16
     image = simplepng.ImageBuffer(width, height)
     if physics_only:
-      paint_physics(image, layer, mapfile["physics"])
-      layer_images[0] = image
-      break
+      if paint_physics(image, layer, mapfile["physics"], i):
+        layer_images[i] = image
     else:
       if paint_with_layer(image, layer, tileset):
-        if i == 2: i = 3 # leave space for the entities layer
         layer_images[i] = image
   return layer_images
 
@@ -127,6 +139,7 @@ mapfiles = [
     "map_name": "APARTMENT",
     "tileset": "Anodyne/src/data/TileData__Apartment_Tiles.png",
     "layers": ["Anodyne/src/data/CSV_Data_APARTMENT_BG.dat", "Anodyne/src/data/CSV_Data_APARTMENT_BG2.dat", "Anodyne/src/data/CSV_Data_APARTMENT_FG.dat"],
+    "physics": " #####################################################################################################################################################       22 hhhhhhhhhhhhhhhhhhhhhhhhhhhhhh,,                                                               l ###     l#### 13  2####hhhhhhhhhhhhhhhhhhh",
   },
   {
     "map_name": "BEACH",
@@ -192,6 +205,7 @@ mapfiles = [
     "map_name": "GO",
     "tileset": "Anodyne/src/data/TileData_Go_Tiles.png",
     "layers": ["Anodyne/src/data/CSV_Data_GO_BG.dat", "Anodyne/src/data/CSV_Data_GO_BG2.dat"],
+    "physics": "##################################################wwww####################################                                        w######### #############################              ##########",
   },
   {
     "map_name": "HAPPY",
@@ -202,16 +216,20 @@ mapfiles = [
     "map_name": "HOTEL",
     "tileset": "Anodyne/src/data/TileData__Hotel_Tiles.png",
     "layers": ["Anodyne/src/data/CSV_Data_HOTEL_BG.dat", "Anodyne/src/data/CSV_Data_HOTEL_BG2.dat", "Anodyne/src/data/CSV_Data_HOTEL_FG.dat"],
+    "physics": " ###############################################################################          hhhhhhhhhhhhhhhhhhhhhhhhhhhhhh           w                                                >v<^      hhhhh               s        ",
   },
   {
     "map_name": "NEXUS",
     "tileset": "Anodyne/src/data/TileData__Nexus_Tiles.png",
     "layers": ["Anodyne/src/data/CSV_Data_NEXUS_BG.dat", "Anodyne/src/data/CSV_Data_NEXUS_FG.dat"],
+    "physics": " #############################              ####                                                                                                     ",
+
   },
   {
     "map_name": "OVERWORLD",
     "tileset": "Anodyne/src/data/TileData__Overworld_Tiles.png",
     "layers": ["Anodyne/src/data/CSV_Data_OVERWORLD_BG.dat", "Anodyne/src/data/CSV_Data_OVERWORLD_BG2.dat"],
+    "physics": " #################################################                                                 ",
   },
   {
     "map_name": "REDCAVE",
@@ -253,7 +271,7 @@ mapfiles = [
 
 physics_tileset_path = "physics_tiles.png"
 physics_tileset = None
-physics_tileset_char_codes = " #l"
+physics_tileset_char_codes = " #l,<^>vwhs 1234"
 
 sprite_paths = {
   "Slime": "Anodyne/src/entity/enemy/bedroom/Slime_Slime_Sprite.png",
