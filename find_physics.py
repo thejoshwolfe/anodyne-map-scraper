@@ -60,6 +60,14 @@ for match in matches:
     char_code = " "
   elif collision_flags == "org.flixel.FlxObject.ANY":
     char_code = "#"
+  elif collision_flags == "org.flixel.FlxObject.LEFT":
+    char_code = "5"
+  elif collision_flags == "org.flixel.FlxObject.UP":
+    char_code = "6"
+  elif collision_flags == "org.flixel.FlxObject.RIGHT":
+    char_code = "7"
+  elif collision_flags == "org.flixel.FlxObject.DOWN":
+    char_code = "8"
   else:
     print("WARNING: unknown collision_flags: {}".format(repr(collision_flags)))
     continue
@@ -93,7 +101,11 @@ for match in matches:
       char_code = "w"
   elif callback in ("data.TileData.spike", "spike"):
     assert(char_code == " ")
-    char_code = "s"
+    if map_name == "REDCAVE" and start == 31:
+      # not it's not. it's jut air.
+      char_code = " "
+    else:
+      char_code = "s"
   else:
     print("WARNING: unknown callback: {}".format(repr(callback)))
     continue
@@ -107,7 +119,6 @@ for match in matches:
 # these override everything else
 if conveyer_overrides != " ":
   for tile_index, char_code in conveyer_overrides.items():
-    print("overriding: {},{},{}".format(tile_index, physics.get(tile_index, "?"), char_code))
     physics[tile_index] = char_code
 
 print('"{}"'.format("".join(physics.get(i, "#") for i in range(max(physics.keys()) + 1))))

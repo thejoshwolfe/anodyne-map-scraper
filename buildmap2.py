@@ -40,8 +40,11 @@ def read_tileset(filename, fade=False):
   return image
 
 def paint_physics(image, layer, physics_palette, layer_index):
-  x_blocks = image.width // 16
-  y_blocks = image.height // 16
+  if layer_index > 1:
+    # foreground never matters for physics
+    return False
+  x_blocks = min(image.width // 16, len(layer[0]))
+  y_blocks = min(image.height // 16, len(layer))
   found_anything = False
   for y in range(y_blocks):
     for x in range(x_blocks):
@@ -94,9 +97,12 @@ def generate_map_image(mapfile, physics_only=False):
     if physics_only:
       if paint_physics(image, layer, mapfile["physics"], i):
         if i > 0:
-          if mapfile["map_name"] in ("GO", "OVERWORLD", "SPACE", "BLUE"):
+          if mapfile["map_name"] in (
+              "GO", "OVERWORLD", "SPACE", "BLUE", "HAPPY", "DEBUG",
+              "FOREST", "REDCAVE", "STREET", "TERMINAL", "WINDMILL",
+            ):
             pass
-          elif mapfile["map_name"] in ("FIELDS", "APARTMENT"):
+          elif mapfile["map_name"] in ("FIELDS", "APARTMENT", "CROWD", "REDSEA"):
             # these don't seem to matter
             continue
           else:
@@ -181,26 +187,31 @@ mapfiles = [
     "map_name": "CIRCUS",
     "tileset": "Anodyne/src/data/TileData__Circus_Tiles.png",
     "layers": ["Anodyne/src/data/CSV_Data_CIRCUS_BG.dat", "Anodyne/src/data/CSV_Data_CIRCUS_FG.dat"],
+    "physics": " ###########################################################      ss shhhhhhhhhh                              w>v<^                                                                                     ",
   },
   {
     "map_name": "CLIFF",
     "tileset": "Anodyne/src/data/TileData_Cliff_Tiles.png",
     "layers": ["Anodyne/src/data/CSV_Data_CLIFF_BG.dat", "Anodyne/src/data/CSV_Data_CLIFF_BG2.dat"],
+    "physics": " #####################################################################################################################################################          #################             ####################ll########   ",
   },
   {
     "map_name": "CROWD",
     "tileset": "Anodyne/src/data/TileData__Crowd_Tiles.png",
     "layers": ["Anodyne/src/data/CSV_Data_CROWD_BG.dat", "Anodyne/src/data/CSV_Data_CROWD_BG2.dat"],
+    "physics": " #######################################   hhhhhhh            # 3     7 #       hhh       hhh       h                                       l         ",
   },
   {
     "map_name": "DEBUG",
     "tileset": "Anodyne/src/data/TileData_Debug_Tiles.png",
     "layers": ["Anodyne/src/data/CSV_Data_DEBUG_BG.dat", "Anodyne/src/data/CSV_Data_DEBUG_BG2.dat", "Anodyne/src/data/CSV_Data_DEBUG_FG.dat"],
+    "physics": " # #8765,h  4321>v<^w#####w#w###s###             ",
   },
   {
     "map_name": "DRAWER",
     "tileset": "Anodyne/src/data/TileData_BlackWhite_Tiles.png",
     "layers": ["Anodyne/src/data/CSV_Data_DRAWER_BG.dat"],
+    "physics": " # ###################### #### ########################################                                         ########                       #######  ########## ##### #   ########  #############  ",
   },
   {
     "map_name": "FIELDS",
@@ -212,6 +223,7 @@ mapfiles = [
     "map_name": "FOREST",
     "tileset": "Anodyne/src/data/TileData_Forest_Tiles.png",
     "layers": ["Anodyne/src/data/CSV_Data_FOREST_BG.dat", "Anodyne/src/data/CSV_Data_FOREST_BG2.dat", "Anodyne/src/data/CSV_Data_FOREST_FG.dat"],
+    "physics": " ###############################################################################                              w                       >v<^  ",
   },
   {
     "map_name": "GO",
@@ -223,6 +235,7 @@ mapfiles = [
     "map_name": "HAPPY",
     "tileset": "Anodyne/src/data/TileData_Happy_Tiles.png",
     "layers": ["Anodyne/src/data/CSV_Data_HAPPY_BG.dat", "Anodyne/src/data/CSV_Data_HAPPY_BG2.dat"],
+    "physics": " ########################################################### #########s#######################################hhhhhhhhhh",
   },
   {
     "map_name": "HOTEL",
@@ -246,11 +259,13 @@ mapfiles = [
     "map_name": "REDCAVE",
     "tileset": "Anodyne/src/data/TileData_REDCAVE_Tiles.png",
     "layers": ["Anodyne/src/data/CSV_Data_REDCAVE_BG.dat", "Anodyne/src/data/CSV_Data_REDCAVE_BG2.dat"],
+    "physics": " # #############>v<^w,,,,,w w s s       hhh       hhh       hhh       hhhhhhh               h",
   },
   {
     "map_name": "REDSEA",
     "tileset": "Anodyne/src/data/TileData_Red_Sea_Tiles.png",
     "layers": ["Anodyne/src/data/CSV_Data_REDSEA_BG.dat", "Anodyne/src/data/CSV_Data_REDSEA_FG.dat"],
+    "physics": " ################################################                                                                                ",
   },
   {
     "map_name": "SPACE",
@@ -262,27 +277,31 @@ mapfiles = [
     "map_name": "STREET",
     "tileset": "Anodyne/src/data/TileData__Street_Tiles.png",
     "layers": ["Anodyne/src/data/CSV_Data_STREET_BG.dat", "Anodyne/src/data/CSV_Data_STREET_BG2.dat", "Anodyne/src/data/CSV_Data_STREET_FG.dat"],
+    "physics": " ############################                                                   ",
   },
   {
     "map_name": "SUBURB",
     "tileset": "Anodyne/src/data/TileData_Suburb_Tiles.png",
     "layers": ["Anodyne/src/data/CSV_Data_SUBURB_BG.dat"],
+    "physics": " #########################################################################################                                                                                ",
   },
   {
     "map_name": "TERMINAL",
     "tileset": "Anodyne/src/data/TileData_Terminal_Tiles.png",
     "layers": ["Anodyne/src/data/CSV_Data_TERMINAL_BG.dat", "Anodyne/src/data/CSV_Data_TERMINAL_BG2.dat"],
+    "physics": " ####################h#######################################hhhh#######################################################   ###hh########   #######   #  ",
   },
   {
     "map_name": "WINDMILL",
     "tileset": "Anodyne/src/data/TileData__Windmill_Tiles.png",
     "layers": ["Anodyne/src/data/CSV_Data_WINDMILL_BG.dat", "Anodyne/src/data/CSV_Data_WINDMILL_BG2.dat"],
+    "physics": " ###################################################################################################          ll                                      ",
   }
 ]
 
 physics_tileset_path = "physics_tiles.png"
 physics_tileset = None
-physics_tileset_char_codes = " #l,<^>vwhs 1234"
+physics_tileset_char_codes = " #l,<^>vwhs 12345678"
 
 sprite_paths = {
   "Slime": "Anodyne/src/entity/enemy/bedroom/Slime_Slime_Sprite.png",
