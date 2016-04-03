@@ -37,6 +37,8 @@ conveyer_data = {
 }
 conveyer_data["DEBUG"] = conveyer_data["REDCAVE"]
 
+conveyer_overrides = conveyer_data.get(map_name, {})
+
 physics = {0: " "}
 for match in matches:
   if match[0] != "":
@@ -70,7 +72,7 @@ for match in matches:
   elif callback == "data.TileData.slow":
     assert(char_code == " ")
     char_code = ","
-  elif callback == "data.TileData.hole":
+  elif callback in ("hole", "data.TileData.hole"):
     assert(char_code == " ")
     char_code = "h"
   elif callback == "data.TileData.thin_left":
@@ -87,8 +89,9 @@ for match in matches:
     char_code = "4"
   elif callback in ("data.TileData.conveyer", "conveyer"):
     assert(char_code == " ")
-    char_code = "w"
-  elif callback == "data.TileData.spike":
+    if conveyer_overrides != " ":
+      char_code = "w"
+  elif callback in ("data.TileData.spike", "spike"):
     assert(char_code == " ")
     char_code = "s"
   else:
@@ -99,6 +102,12 @@ for match in matches:
     print("WARNING: unknown entity_filter: {}".format(repr(entity_filter)))
 
   for i in range(start, end):
-    physics[i] = conveyer_data.get(map_name, {}).get(i, char_code)
+    physics[i] = char_code
 
-print('"{}"'.format("".join(physics.get(i, "#") for i in range(max(physics.keys())))))
+# these override everything else
+if conveyer_overrides != " ":
+  for tile_index, char_code in conveyer_overrides.items():
+    print("overriding: {},{},{}".format(tile_index, physics.get(tile_index, "?"), char_code))
+    physics[tile_index] = char_code
+
+print('"{}"'.format("".join(physics.get(i, "#") for i in range(max(physics.keys()) + 1))))

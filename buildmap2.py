@@ -13,6 +13,7 @@
 #
 
 import os
+import sys
 import csv
 import simplepng
 from collections import defaultdict
@@ -53,9 +54,6 @@ def paint_physics(image, layer, physics_palette, layer_index):
           char_code = physics_palette[tile_index]
         except IndexError:
           char_code = "#"
-      if layer_index != 0 and char_code == "h":
-        # these tiles in BG2 don't seem to matter
-        continue
       if layer_index != 0 and char_code == " ":
         # this is typical for upper layers
         continue
@@ -95,6 +93,14 @@ def generate_map_image(mapfile, physics_only=False):
     image = simplepng.ImageBuffer(width, height)
     if physics_only:
       if paint_physics(image, layer, mapfile["physics"], i):
+        if i > 0:
+          if mapfile["map_name"] in ("GO", "OVERWORLD", "SPACE", "BLUE"):
+            pass
+          elif mapfile["map_name"] in ("FIELDS", "APARTMENT"):
+            # these don't seem to matter
+            continue
+          else:
+            sys.exit("ERROR: got physics on layer {} for map: {}".format(i, mapfile["map_name"]))
         layer_images[i] = image
     else:
       if paint_with_layer(image, layer, tileset):
@@ -139,32 +145,37 @@ mapfiles = [
     "map_name": "APARTMENT",
     "tileset": "Anodyne/src/data/TileData__Apartment_Tiles.png",
     "layers": ["Anodyne/src/data/CSV_Data_APARTMENT_BG.dat", "Anodyne/src/data/CSV_Data_APARTMENT_BG2.dat", "Anodyne/src/data/CSV_Data_APARTMENT_FG.dat"],
-    "physics": " #####################################################################################################################################################       22 hhhhhhhhhhhhhhhhhhhhhhhhhhhhhh,,                                                               l ###     l#### 13  2####hhhhhhhhhhhhhhhhhhh",
+    "physics": " #####################################################################################################################################################       22 hhhhhhhhhhhhhhhhhhhhhhhhhhhhhh,,              w                        w                       l ###     l#### 13  2####hhhhhhhhhhhhhhhhhhhh",
   },
   {
     "map_name": "BEACH",
     "tileset": "Anodyne/src/data/TileData__Beach_Tiles.png",
     "layers": ["Anodyne/src/data/CSV_Data_BEACH_BG.dat"],
+    "physics": " #######################################################################################################################################################################################################                                                             #        # #  ",
   },
   {
     "map_name": "BEDROOM",
     "tileset": "Anodyne/src/data/TileData__Bedroom_Tiles.png",
     "layers": ["Anodyne/src/data/CSV_Data_BEDROOM_BG.dat"],
+    "physics": " ####4##################             h                        ",
   },
   {
     "map_name": "BLANK",
     "tileset": "Anodyne/src/data/TileData_Blank_Tiles.png",
     "layers": ["Anodyne/src/data/CSV_Data_BLANK_BG.dat"],
+    "physics": "# ###############                      ",
   },
   {
     "map_name": "BLUE",
     "tileset": "Anodyne/src/data/TileData_Blue_Tiles.png",
     "layers": ["Anodyne/src/data/CSV_Data_BLUE_BG.dat", "Anodyne/src/data/CSV_Data_BLUE_BG2.dat"],
+    "physics": " ###########################################################          s#######################################hhhhhhhhhh",
   },
   {
     "map_name": "CELL",
     "tileset": "Anodyne/src/data/TileData_Cell_Tiles.png",
     "layers": ["Anodyne/src/data/CSV_Data_CELL_BG.dat"],
+    "physics": " #############hh########################                              hh########ss",
   },
   {
     "map_name": "CIRCUS",
@@ -195,6 +206,7 @@ mapfiles = [
     "map_name": "FIELDS",
     "tileset": "Anodyne/src/data/TileData__Fields_Tiles.png",
     "layers": ["Anodyne/src/data/CSV_Data_FIELDS_BG.dat", "Anodyne/src/data/CSV_Data_FIELDS_FG.dat"],
+    "physics": " #######################################################################################################################################################################################################   hhs                                            w             ######>v<^",
   },
   {
     "map_name": "FOREST",
@@ -205,7 +217,7 @@ mapfiles = [
     "map_name": "GO",
     "tileset": "Anodyne/src/data/TileData_Go_Tiles.png",
     "layers": ["Anodyne/src/data/CSV_Data_GO_BG.dat", "Anodyne/src/data/CSV_Data_GO_BG2.dat"],
-    "physics": "##################################################wwww####################################                                        w######### #############################              ##########",
+    "physics": "##################################################wwww####################################                                        w######### #############################              ##########w",
   },
   {
     "map_name": "HAPPY",
@@ -216,20 +228,19 @@ mapfiles = [
     "map_name": "HOTEL",
     "tileset": "Anodyne/src/data/TileData__Hotel_Tiles.png",
     "layers": ["Anodyne/src/data/CSV_Data_HOTEL_BG.dat", "Anodyne/src/data/CSV_Data_HOTEL_BG2.dat", "Anodyne/src/data/CSV_Data_HOTEL_FG.dat"],
-    "physics": " ###############################################################################          hhhhhhhhhhhhhhhhhhhhhhhhhhhhhh           w                                                >v<^      hhhhh               s        ",
+    "physics": " ###############################################################################          hhhhhhhhhhhhhhhhhhhhhhhhhhhhhh           w                                                >v<^      hhhhh               s         ",
   },
   {
     "map_name": "NEXUS",
     "tileset": "Anodyne/src/data/TileData__Nexus_Tiles.png",
     "layers": ["Anodyne/src/data/CSV_Data_NEXUS_BG.dat", "Anodyne/src/data/CSV_Data_NEXUS_FG.dat"],
-    "physics": " #############################              ####                                                                                                     ",
-
+    "physics": " #############################              ####                                                                                                      ",
   },
   {
     "map_name": "OVERWORLD",
     "tileset": "Anodyne/src/data/TileData__Overworld_Tiles.png",
     "layers": ["Anodyne/src/data/CSV_Data_OVERWORLD_BG.dat", "Anodyne/src/data/CSV_Data_OVERWORLD_BG2.dat"],
-    "physics": " #################################################                                                 ",
+    "physics": " #################################################                                                  ",
   },
   {
     "map_name": "REDCAVE",
@@ -245,7 +256,7 @@ mapfiles = [
     "map_name": "SPACE",
     "tileset": "Anodyne/src/data/TileData_Space_Tiles.png",
     "layers": ["Anodyne/src/data/CSV_Data_SPACE_BG.dat", "Anodyne/src/data/CSV_Data_SPACE_BG2.dat", "Anodyne/src/data/CSV_Data_SPACE_FG.dat"],
-    "physics": " ########### ############ ######################################################                              llllllllll ",
+    "physics": " ########### ############ ######################################################                              llllllllll  ",
   },
   {
     "map_name": "STREET",
@@ -677,6 +688,9 @@ def render_entities(image, entities, map_name, physics_only=False):
         sy = 64
       else:
         sy = 16
+      if map_name == "NEXUS" and x < 500:
+        # this button isn't real
+        continue
     elif entity_name in ("Hole", "CrackedTile"):
       if map_name == "BEDROOM":
         pass
