@@ -71,8 +71,8 @@ def paint_physics(image, layer, physics_palette, layer_index):
   return found_anything
 
 def paint_with_layer(image, layer, tileset):
-  x_blocks = image.width // 16
-  y_blocks = image.height // 16
+  x_blocks = min(image.width // 16, len(layer[0]))
+  y_blocks = min(image.height // 16, len(layer))
   found_anything = False
   for y in range(y_blocks):
     for x in range(x_blocks):
