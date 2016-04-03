@@ -60,6 +60,9 @@ def paint_physics(image, layer, physics_palette, layer_index):
       if layer_index != 0 and char_code == " ":
         # this is typical for upper layers
         continue
+      if layer_index == 1 and char_code == "#":
+        # impervious
+        char_code = "&"
       found_anything = True
       output_tile_index = physics_tileset_char_codes.index(char_code)
       tile_y = output_tile_index // (physics_tileset.width // 16)
@@ -259,7 +262,7 @@ mapfiles = [
     "map_name": "REDCAVE",
     "tileset": "Anodyne/src/data/TileData_REDCAVE_Tiles.png",
     "layers": ["Anodyne/src/data/CSV_Data_REDCAVE_BG.dat", "Anodyne/src/data/CSV_Data_REDCAVE_BG2.dat"],
-    "physics": " # #############>v<^w,,,,,w w s s       hhh       hhh       hhh       hhhhhhh               h",
+    "physics": " # #############>v<^,,,,,,w w s s       hhh       hhh       hhh       hhhhhhh               h",
   },
   {
     "map_name": "REDSEA",
@@ -301,7 +304,7 @@ mapfiles = [
 
 physics_tileset_path = "physics_tiles.png"
 physics_tileset = None
-physics_tileset_char_codes = " #l,<^>vwhs 12345678"
+physics_tileset_char_codes = " #l,<^>vwhs&12345678"
 
 sprite_paths = {
   "Slime": "Anodyne/src/entity/enemy/bedroom/Slime_Slime_Sprite.png",

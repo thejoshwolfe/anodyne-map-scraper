@@ -119,6 +119,7 @@ for match in matches:
 # these override everything else
 if conveyer_overrides != " ":
   for tile_index, char_code in conveyer_overrides.items():
+    if physics.get(tile_index, "w") != "w": continue
     physics[tile_index] = char_code
 
 print('"{}"'.format("".join(physics.get(i, "#") for i in range(max(physics.keys()) + 1))))
