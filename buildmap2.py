@@ -314,7 +314,6 @@ sprite_paths = {
     "Anodyne/src/entity/gadget/Door_Nexus_door_overlay_embed.png",
     "Anodyne/src/entity/gadget/Door_Sprite_nexus_door.png",
     "Anodyne/src/entity/gadget/Door_Door_Sprites.png",
-    "Anodyne/src/entity/gadget/Door_Nexus_door_previews_embed.png",
   ],
   "Wall_Laser": "???",
   "Eye_Light": "Anodyne/src/entity/decoration/Eye_Light_Eye_Light_Sprite.png",
@@ -462,6 +461,7 @@ def load_sprites():
   sprites["npc_squiggles"] = read_tileset("Anodyne/src/entity/interactive/NPC_npc_spritesheet.png")
   sprites["debug_tree"] = read_tileset("Anodyne/src/entity/decoration/Solid_Sprite_trees_sprites.png")
   sprites["npc_devs"] = read_tileset("Anodyne/src/states/EndingState_embed_dev_npcs.png")
+  sprites["nexus_doors"] = read_tileset("Anodyne/src/entity/gadget/Door_Nexus_door_previews_embed.png")
   global physics_tileset
   physics_tileset = read_tileset(physics_tileset_path)
 
@@ -1053,14 +1053,66 @@ def render_entities(image, entities, map_name, physics_only=False):
         sy = 32
     elif entity_name == "Door":
       door_type = entity["type"]
-      if door_type in ("1", "5", "6", "8", "9", "10", "11", "12", "13", "14", "15"):
+      if door_type in ("1", "5", "6", "8", "10", "11", "12", "13", "14", "15"):
         continue # invisible
       elif door_type == "4":
         sprite = sprites["door_portal"]
         if map_name == "CELL":
           sy = 16
       elif door_type == "7":
+        if map_name == "NEXUS":
+          # this one's invisible
+          continue
         sprite = sprites["whirlpool"]
+      elif door_type == "9":
+        if map_name != "NEXUS":
+          continue
+        sprite = sprites["nexus_doors"]
+        width = 32
+        height = 32
+        if frame == 13: # STREET
+          sy = 0 * 32
+        elif frame == 49: # OVERWORLD
+          sy = 1 * 32
+        elif frame == 63: # BEDROOM
+          sy = 12 * 32
+        elif frame == 46: # SUBURB
+          sy = 19 * 32
+        elif frame == 60: # APARTMENT
+          sy = 4 * 32
+        elif frame == 55: # BEACH
+          sy = 11 * 32
+        elif frame == 48: # FIELDS
+          sy = 13 * 32
+        elif frame == 50: # FOREST
+          sy = 8 * 32
+        elif frame == 51: # TERMINAL
+          sy = 15 * 32
+        elif frame == 64: # WINDMILL
+          sy = 9 * 32
+        elif frame == 52: # GO
+          sy = 14 * 32
+        elif frame == 56: # BLUE
+          sy = 20 * 32
+        elif frame == 57: # HAPPY
+          sy = 16 * 32
+        elif frame == 62: # REDCAVE
+          sy = 2 * 32
+        elif frame == 53: # REDSEA
+          sy = 10 * 32
+        elif frame == 54: # CLIFF
+          sy = 7 * 32
+        elif frame == 61: # CROWD
+          sy = 3 * 32
+        elif frame == 58: # CIRCUS
+          sy = 6 * 32
+        elif frame == 45: # CELL
+          sy = 18 * 32
+        elif frame == 47: # SPACE
+          sy = 17 * 32
+        elif frame == 59: # HOTEL
+          sy = 5 * 32
+        else: unreachable()
       elif door_type == "16":
         sprite = sprites["nexus_pad"]
         width = 32
