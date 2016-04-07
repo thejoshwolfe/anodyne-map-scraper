@@ -91,7 +91,9 @@ def generate_map_image(mapfile, physics_only=False):
   width = None
   height = None
   for i, layerfile in enumerate(mapfile["layers"]):
+    if layerfile == None: continue
     if i == 2: i = 3 # leave space for the entities layer
+
     layer = read_layer(layerfile)
     if width == None:
       width = len(layer[0]) * 16
@@ -189,7 +191,7 @@ mapfiles = [
   {
     "map_name": "CIRCUS",
     "tileset": "Anodyne/src/data/TileData__Circus_Tiles.png",
-    "layers": ["Anodyne/src/data/CSV_Data_CIRCUS_BG.dat", "Anodyne/src/data/CSV_Data_CIRCUS_FG.dat"],
+    "layers": ["Anodyne/src/data/CSV_Data_CIRCUS_BG.dat", None, "Anodyne/src/data/CSV_Data_CIRCUS_FG.dat"],
     "physics": " ###########################################################      ss shhhhhhhhhh                              w>v<^                                                                                     ",
   },
   {
@@ -219,7 +221,7 @@ mapfiles = [
   {
     "map_name": "FIELDS",
     "tileset": "Anodyne/src/data/TileData__Fields_Tiles.png",
-    "layers": ["Anodyne/src/data/CSV_Data_FIELDS_BG.dat", "Anodyne/src/data/CSV_Data_FIELDS_FG.dat"],
+    "layers": ["Anodyne/src/data/CSV_Data_FIELDS_BG.dat", None, "Anodyne/src/data/CSV_Data_FIELDS_FG.dat"],
     "physics": " #######################################################################################################################################################################################################   hhs                                            w             ######>v<^",
   },
   {
@@ -249,7 +251,7 @@ mapfiles = [
   {
     "map_name": "NEXUS",
     "tileset": "Anodyne/src/data/TileData__Nexus_Tiles.png",
-    "layers": ["Anodyne/src/data/CSV_Data_NEXUS_BG.dat", "Anodyne/src/data/CSV_Data_NEXUS_FG.dat"],
+    "layers": ["Anodyne/src/data/CSV_Data_NEXUS_BG.dat", None, "Anodyne/src/data/CSV_Data_NEXUS_FG.dat"],
     "physics": " #############################              ####                                                                                                      ",
   },
   {
@@ -267,7 +269,7 @@ mapfiles = [
   {
     "map_name": "REDSEA",
     "tileset": "Anodyne/src/data/TileData_Red_Sea_Tiles.png",
-    "layers": ["Anodyne/src/data/CSV_Data_REDSEA_BG.dat", "Anodyne/src/data/CSV_Data_REDSEA_FG.dat"],
+    "layers": ["Anodyne/src/data/CSV_Data_REDSEA_BG.dat", None, "Anodyne/src/data/CSV_Data_REDSEA_FG.dat"],
     "physics": " ################################################                                                                                ",
   },
   {
@@ -1203,8 +1205,13 @@ def render_entities(image, entities, map_name, physics_only=False):
         print("WARNING: ignoring entity: {}".format(entity_name))
 
   if map_name == "GO":
-    # instructions rock for tile swapping puzzle
+    # instructions rock for color puzzle
     image.paste(sprites["npc_rock"], dx=352, dy=496, width=16, height=16)
+    # hint rock for color puzzle
+    image.paste(sprites["npc_rock"], dx=192, dy=512, width=16, height=16)
+    # gates in front of color puzzle
+    image.paste(sprites["Gate"], dx=384, dy=480, width=16, height=16)
+    image.paste(sprites["Gate"], dx=400, dy=480, width=16, height=16)
     did_anything = True
 
   return did_anything
