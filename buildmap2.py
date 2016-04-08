@@ -687,6 +687,9 @@ def render_entities(image, entities, map_name, physics_only=False):
     elif entity_name == "Treasure":
       if map_name == "CELL":
         sy = 32
+      elif map_name == "REDCAVE" and frame == 6:
+        # no, there's no chest containing another Swap upgrade in the Red Cave
+        continue
     elif entity_name == "Rat":
       if map_name == "CELL":
         sy = 16
