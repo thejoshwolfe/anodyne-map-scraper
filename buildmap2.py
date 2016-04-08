@@ -466,6 +466,10 @@ def load_sprites():
   sprites["nexus_doors"] = read_tileset("Anodyne/src/entity/gadget/Door_Nexus_door_previews_embed.png")
   global physics_tileset
   physics_tileset = read_tileset(physics_tileset_path)
+  global grid_overlay
+  grid_overlay = read_tileset("grid_overlay.png")
+  global grid_overlay_solid
+  grid_overlay_solid = read_tileset("grid_overlay_solid.png")
 
 warning_set = set()
 def render_entities(image, entities, map_name, physics_only=False):
@@ -1236,6 +1240,7 @@ def main():
   parser.add_argument("-s", "--separate", action="store_true")
   parser.add_argument("-f", "--force", action="store_true")
   parser.add_argument("-p", "--physics", action="store_true")
+  parser.add_argument("-g", "--grid", action="store_true")
   args = parser.parse_args()
 
   valid_map_names = set(mapfile["map_name"] for mapfile in mapfiles)
@@ -1277,6 +1282,14 @@ def main():
         if layer == None: continue
         for i in range(len(layer.data)):
           layer.data[i] = grayscale(layer.data[i])
+
+    # overlay grid lines
+    if args.grid:
+      for layer in layers:
+        if layer == None: continue
+        for y in range(layer.height // 160):
+          for x in range(layer.width // 160):
+            layer.paste([grid_overlay, grid_overlay_solid][args.physics], dx=x*160, dy=y*160)
 
     # save images
     if args.separate:
