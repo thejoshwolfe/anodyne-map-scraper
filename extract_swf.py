@@ -39,6 +39,7 @@ def main():
       assert([c for c in prefix_part if c not in "01234596789"] == [])
       # undo "/" -> "." transformation, but don't replace too many "."s.
       name, ext = name.rsplit(".", 1)
+      # lowercase letters are package names. uppercase letters are the start of the file name.
       name_start = re.search("[^.a-z]", name).start()
       name = name[:name_start].replace(".", "/") + name[name_start:]
       name = name + "." + ext
