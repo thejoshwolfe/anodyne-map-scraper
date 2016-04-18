@@ -366,7 +366,6 @@ sprite_paths = {
     "entity/interactive/NPC_embed_geoms.png",
     "entity/interactive/NPC_embed_nexus_pad.png",
     "entity/interactive/NPC_embed_windmill_blade.png",
-    "entity/interactive/NPC_embed_randoms.png",
     "entity/interactive/NPC_note_rock.png",
     "entity/interactive/NPC_npc_spritesheet.png",
   ],
@@ -476,6 +475,7 @@ def load_sprites():
   sprites["debug_tree"] = read_tileset("entity/decoration/Solid_Sprite_trees_sprites.png")
   sprites["npc_devs"] = read_tileset("states/EndingState_embed_dev_npcs.png")
   sprites["nexus_doors"] = read_tileset("entity/gadget/Door_Nexus_door_previews_embed.png")
+  sprites["random_npcs"] = read_tileset("entity/interactive/NPC_embed_randoms.png")
   global physics_tileset
   physics_tileset = read_tileset(physics_tileset_path)
   global grid_overlay
@@ -699,9 +699,6 @@ def render_entities(image, entities, map_name, physics_only=False):
     elif entity_name == "Treasure":
       if map_name == "CELL":
         sy = 32
-      elif map_name == "REDCAVE" and frame == 6:
-        # no, there's no chest containing another Swap upgrade in the Red Cave
-        continue
     elif entity_name == "Rat":
       if map_name == "CELL":
         sy = 16
@@ -731,9 +728,6 @@ def render_entities(image, entities, map_name, physics_only=False):
         sy = 64
       else:
         sy = 16
-      if map_name == "NEXUS" and x < 500:
-        # this button isn't real
-        continue
     elif entity_name in ("Hole", "CrackedTile"):
       if map_name == "BEDROOM":
         pass
@@ -761,6 +755,7 @@ def render_entities(image, entities, map_name, physics_only=False):
     elif entity_name == "Key":
       if y > 100:
         # this one's not real, i guess
+        print("WARNING: ignoring key at: {},{}".format(x, y))
         continue
     elif entity_name == "Dungeon_Statue":
       width = 32
@@ -797,9 +792,6 @@ def render_entities(image, entities, map_name, physics_only=False):
           sy = 48
           if x > 912:
             sx = 16
-        elif map_name == "GO":
-          # there's a bunch of garbage rocks off screen in GO
-          continue
       elif npc_type == "statue":
         sprite = sprites["npc_sage_statue"]
       elif npc_type == "big_key":
@@ -913,6 +905,8 @@ def render_entities(image, entities, map_name, physics_only=False):
           elif frame == 18:
             sy = 16
           else: unreachable()
+        elif map_name == "APARTMENT":
+          sprite = sprites["random_npcs"]
         else:
           print("WARNING: ignoring generic npc in map: {}: {}: {},{}".format(map_name, frame, x, y))
           continue
@@ -1222,16 +1216,6 @@ def render_entities(image, entities, map_name, physics_only=False):
       if entity_name not in warning_set:
         warning_set.add(entity_name)
         print("WARNING: ignoring entity: {}".format(entity_name))
-
-  if map_name == "GO":
-    # instructions rock for color puzzle
-    image.paste(sprites["npc_rock"], dx=352, dy=496, width=16, height=16)
-    # hint rock for color puzzle
-    image.paste(sprites["npc_rock"], dx=192, dy=512, width=16, height=16)
-    # gates in front of color puzzle
-    image.paste(sprites["Gate"], dx=384, dy=480, width=16, height=16)
-    image.paste(sprites["Gate"], dx=400, dy=480, width=16, height=16)
-    did_anything = True
 
   return did_anything
 
