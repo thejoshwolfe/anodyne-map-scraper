@@ -20,18 +20,30 @@ from collections import defaultdict
 import itertools
 from xml import sax
 
+def find_and_open(filename, mode):
+  try: return open(filename, mode)
+  except OSError: pass
+
+  try: return open(os.path.join(src_root, filename), mode)
+  except OSError: pass
+
+  if filename.endswith(".dat"):
+    try: return open(os.path.join(src_root, filename[:-len(".dat")]+".bin"), mode)
+    except OSError: pass
+  # broken
+  open(filename, mode)
+
 def read_layer(filename):
-  f = open(filename, "r")
-  map_reader = csv.reader(f, delimiter=",")
-  map = []
-  for row in map_reader:
-    map.append(row)
-  f.close()
+  with find_and_open(filename, "r") as f:
+    map_reader = csv.reader(f, delimiter=",")
+    map = []
+    for row in map_reader:
+      map.append(row)
   return map
 
 
 def read_tileset(filename, fade=False):
-  with open(filename, "rb") as f:
+  with find_and_open(filename, "rb") as f:
     image = simplepng.read_png(f)
   if fade:
     # apply semitransparency by clearing the msb of the alpha channel
@@ -146,7 +158,7 @@ def read_registry():
   parser = sax.make_parser()
   handler = RegistryHandler()
   parser.setContentHandler( handler )
-  parser.parse( 'Anodyne/src/global/Registry_EmbedXML.dat')
+  parser.parse(find_and_open("global/Registry_EmbedXML.dat", "r"))
   return handler.objects_by_map_name
 
 
@@ -154,152 +166,152 @@ def read_registry():
 mapfiles = [
   {
     "map_name": "APARTMENT",
-    "tileset": "Anodyne/src/data/TileData__Apartment_Tiles.png",
-    "layers": ["Anodyne/src/data/CSV_Data_APARTMENT_BG.dat", "Anodyne/src/data/CSV_Data_APARTMENT_BG2.dat", "Anodyne/src/data/CSV_Data_APARTMENT_FG.dat"],
+    "tileset": "data/TileData__Apartment_Tiles.png",
+    "layers": ["data/CSV_Data_APARTMENT_BG.dat", "data/CSV_Data_APARTMENT_BG2.dat", "data/CSV_Data_APARTMENT_FG.dat"],
     "physics": " #####################################################################################################################################################       22 hhhhhhhhhhhhhhhhhhhhhhhhhhhhhh,,              w                        w                       l ###     l#### 13  2####hhhhhhhhhhhhhhhhhhhh",
   },
   {
     "map_name": "BEACH",
-    "tileset": "Anodyne/src/data/TileData__Beach_Tiles.png",
-    "layers": ["Anodyne/src/data/CSV_Data_BEACH_BG.dat"],
+    "tileset": "data/TileData__Beach_Tiles.png",
+    "layers": ["data/CSV_Data_BEACH_BG.dat"],
     "physics": " #######################################################################################################################################################################################################                                                             #        # #  ",
   },
   {
     "map_name": "BEDROOM",
-    "tileset": "Anodyne/src/data/TileData__Bedroom_Tiles.png",
-    "layers": ["Anodyne/src/data/CSV_Data_BEDROOM_BG.dat"],
+    "tileset": "data/TileData__Bedroom_Tiles.png",
+    "layers": ["data/CSV_Data_BEDROOM_BG.dat"],
     "physics": " ####4##################             h                        ",
   },
   {
     "map_name": "BLANK",
-    "tileset": "Anodyne/src/data/TileData_Blank_Tiles.png",
-    "layers": ["Anodyne/src/data/CSV_Data_BLANK_BG.dat"],
+    "tileset": "data/TileData_Blank_Tiles.png",
+    "layers": ["data/CSV_Data_BLANK_BG.dat"],
     "physics": "# ###############                      ",
   },
   {
     "map_name": "BLUE",
-    "tileset": "Anodyne/src/data/TileData_Blue_Tiles.png",
-    "layers": ["Anodyne/src/data/CSV_Data_BLUE_BG.dat", "Anodyne/src/data/CSV_Data_BLUE_BG2.dat"],
+    "tileset": "data/TileData_Blue_Tiles.png",
+    "layers": ["data/CSV_Data_BLUE_BG.dat", "data/CSV_Data_BLUE_BG2.dat"],
     "physics": " ###########################################################          s#######################################hhhhhhhhhh",
   },
   {
     "map_name": "CELL",
-    "tileset": "Anodyne/src/data/TileData_Cell_Tiles.png",
-    "layers": ["Anodyne/src/data/CSV_Data_CELL_BG.dat"],
+    "tileset": "data/TileData_Cell_Tiles.png",
+    "layers": ["data/CSV_Data_CELL_BG.dat"],
     "physics": " #############hh########################                              hh########ss",
   },
   {
     "map_name": "CIRCUS",
-    "tileset": "Anodyne/src/data/TileData__Circus_Tiles.png",
-    "layers": ["Anodyne/src/data/CSV_Data_CIRCUS_BG.dat", None, "Anodyne/src/data/CSV_Data_CIRCUS_FG.dat"],
+    "tileset": "data/TileData__Circus_Tiles.png",
+    "layers": ["data/CSV_Data_CIRCUS_BG.dat", None, "data/CSV_Data_CIRCUS_FG.dat"],
     "physics": " ###########################################################      ss shhhhhhhhhh                              w>v<^                                                                                     ",
   },
   {
     "map_name": "CLIFF",
-    "tileset": "Anodyne/src/data/TileData_Cliff_Tiles.png",
-    "layers": ["Anodyne/src/data/CSV_Data_CLIFF_BG.dat", "Anodyne/src/data/CSV_Data_CLIFF_BG2.dat"],
+    "tileset": "data/TileData_Cliff_Tiles.png",
+    "layers": ["data/CSV_Data_CLIFF_BG.dat", "data/CSV_Data_CLIFF_BG2.dat"],
     "physics": " #####################################################################################################################################################          #################             ####################ll########   ",
   },
   {
     "map_name": "CROWD",
-    "tileset": "Anodyne/src/data/TileData__Crowd_Tiles.png",
-    "layers": ["Anodyne/src/data/CSV_Data_CROWD_BG.dat", "Anodyne/src/data/CSV_Data_CROWD_BG2.dat"],
+    "tileset": "data/TileData__Crowd_Tiles.png",
+    "layers": ["data/CSV_Data_CROWD_BG.dat", "data/CSV_Data_CROWD_BG2.dat"],
     "physics": " #######################################   hhhhhhh            # 3     7 #       hhh       hhh       h                                       l         ",
   },
   {
     "map_name": "DEBUG",
-    "tileset": "Anodyne/src/data/TileData_Debug_Tiles.png",
-    "layers": ["Anodyne/src/data/CSV_Data_DEBUG_BG.dat", "Anodyne/src/data/CSV_Data_DEBUG_BG2.dat", "Anodyne/src/data/CSV_Data_DEBUG_FG.dat"],
+    "tileset": "data/TileData_Debug_Tiles.png",
+    "layers": ["data/CSV_Data_DEBUG_BG.dat", "data/CSV_Data_DEBUG_BG2.dat", "data/CSV_Data_DEBUG_FG.dat"],
     "physics": " # #8765,h  4321>v<^w#####w#w###s###             ",
   },
   {
     "map_name": "DRAWER",
-    "tileset": "Anodyne/src/data/TileData_BlackWhite_Tiles.png",
-    "layers": ["Anodyne/src/data/CSV_Data_DRAWER_BG.dat"],
+    "tileset": "data/TileData_BlackWhite_Tiles.png",
+    "layers": ["data/CSV_Data_DRAWER_BG.dat"],
     "physics": " # ###################### #### ########################################                                         ########                       #######  ########## ##### #   ########  #############  ",
   },
   {
     "map_name": "FIELDS",
-    "tileset": "Anodyne/src/data/TileData__Fields_Tiles.png",
-    "layers": ["Anodyne/src/data/CSV_Data_FIELDS_BG.dat", None, "Anodyne/src/data/CSV_Data_FIELDS_FG.dat"],
+    "tileset": "data/TileData__Fields_Tiles.png",
+    "layers": ["data/CSV_Data_FIELDS_BG.dat", None, "data/CSV_Data_FIELDS_FG.dat"],
     "physics": " #######################################################################################################################################################################################################   hhs                                            w             ######>v<^",
   },
   {
     "map_name": "FOREST",
-    "tileset": "Anodyne/src/data/TileData_Forest_Tiles.png",
-    "layers": ["Anodyne/src/data/CSV_Data_FOREST_BG.dat", "Anodyne/src/data/CSV_Data_FOREST_BG2.dat", "Anodyne/src/data/CSV_Data_FOREST_FG.dat"],
+    "tileset": "data/TileData_Forest_Tiles.png",
+    "layers": ["data/CSV_Data_FOREST_BG.dat", "data/CSV_Data_FOREST_BG2.dat", "data/CSV_Data_FOREST_FG.dat"],
     "physics": " ###############################################################################                              w                       >v<^  ",
   },
   {
     "map_name": "GO",
-    "tileset": "Anodyne/src/data/TileData_Go_Tiles.png",
-    "layers": ["Anodyne/src/data/CSV_Data_GO_BG.dat", "Anodyne/src/data/CSV_Data_GO_BG2.dat"],
+    "tileset": "data/TileData_Go_Tiles.png",
+    "layers": ["data/CSV_Data_GO_BG.dat", "data/CSV_Data_GO_BG2.dat"],
     "physics": "##################################################wwww####################################                                        w######### #############################              ##########w",
   },
   {
     "map_name": "HAPPY",
-    "tileset": "Anodyne/src/data/TileData_Happy_Tiles.png",
-    "layers": ["Anodyne/src/data/CSV_Data_HAPPY_BG.dat", "Anodyne/src/data/CSV_Data_HAPPY_BG2.dat"],
+    "tileset": "data/TileData_Happy_Tiles.png",
+    "layers": ["data/CSV_Data_HAPPY_BG.dat", "data/CSV_Data_HAPPY_BG2.dat"],
     "physics": " ########################################################### #########s#######################################hhhhhhhhhh",
   },
   {
     "map_name": "HOTEL",
-    "tileset": "Anodyne/src/data/TileData__Hotel_Tiles.png",
-    "layers": ["Anodyne/src/data/CSV_Data_HOTEL_BG.dat", "Anodyne/src/data/CSV_Data_HOTEL_BG2.dat", "Anodyne/src/data/CSV_Data_HOTEL_FG.dat"],
+    "tileset": "data/TileData__Hotel_Tiles.png",
+    "layers": ["data/CSV_Data_HOTEL_BG.dat", "data/CSV_Data_HOTEL_BG2.dat", "data/CSV_Data_HOTEL_FG.dat"],
     "physics": " ###############################################################################          hhhhhhhhhhhhhhhhhhhhhhhhhhhhhh           w                                                >v<^      hhhhh               s         ",
   },
   {
     "map_name": "NEXUS",
-    "tileset": "Anodyne/src/data/TileData__Nexus_Tiles.png",
-    "layers": ["Anodyne/src/data/CSV_Data_NEXUS_BG.dat", None, "Anodyne/src/data/CSV_Data_NEXUS_FG.dat"],
+    "tileset": "data/TileData__Nexus_Tiles.png",
+    "layers": ["data/CSV_Data_NEXUS_BG.dat", None, "data/CSV_Data_NEXUS_FG.dat"],
     "physics": " #############################              ####                                                                                                      ",
   },
   {
     "map_name": "OVERWORLD",
-    "tileset": "Anodyne/src/data/TileData__Overworld_Tiles.png",
-    "layers": ["Anodyne/src/data/CSV_Data_OVERWORLD_BG.dat", "Anodyne/src/data/CSV_Data_OVERWORLD_BG2.dat"],
+    "tileset": "data/TileData__Overworld_Tiles.png",
+    "layers": ["data/CSV_Data_OVERWORLD_BG.dat", "data/CSV_Data_OVERWORLD_BG2.dat"],
     "physics": " #################################################                                                  ",
   },
   {
     "map_name": "REDCAVE",
-    "tileset": "Anodyne/src/data/TileData_REDCAVE_Tiles.png",
-    "layers": ["Anodyne/src/data/CSV_Data_REDCAVE_BG.dat", "Anodyne/src/data/CSV_Data_REDCAVE_BG2.dat"],
+    "tileset": "data/TileData_REDCAVE_Tiles.png",
+    "layers": ["data/CSV_Data_REDCAVE_BG.dat", "data/CSV_Data_REDCAVE_BG2.dat"],
     "physics": " # #############>v<^,,,,,,w w s s       hhh       hhh       hhh       hhhhhhh               h",
   },
   {
     "map_name": "REDSEA",
-    "tileset": "Anodyne/src/data/TileData_Red_Sea_Tiles.png",
-    "layers": ["Anodyne/src/data/CSV_Data_REDSEA_BG.dat", None, "Anodyne/src/data/CSV_Data_REDSEA_FG.dat"],
+    "tileset": "data/TileData_Red_Sea_Tiles.png",
+    "layers": ["data/CSV_Data_REDSEA_BG.dat", None, "data/CSV_Data_REDSEA_FG.dat"],
     "physics": " ################################################                                                                                ",
   },
   {
     "map_name": "SPACE",
-    "tileset": "Anodyne/src/data/TileData_Space_Tiles.png",
-    "layers": ["Anodyne/src/data/CSV_Data_SPACE_BG.dat", "Anodyne/src/data/CSV_Data_SPACE_BG2.dat", "Anodyne/src/data/CSV_Data_SPACE_FG.dat"],
+    "tileset": "data/TileData_Space_Tiles.png",
+    "layers": ["data/CSV_Data_SPACE_BG.dat", "data/CSV_Data_SPACE_BG2.dat", "data/CSV_Data_SPACE_FG.dat"],
     "physics": " ########### ############ ######################################################                              llllllllll  ",
   },
   {
     "map_name": "STREET",
-    "tileset": "Anodyne/src/data/TileData__Street_Tiles.png",
-    "layers": ["Anodyne/src/data/CSV_Data_STREET_BG.dat", "Anodyne/src/data/CSV_Data_STREET_BG2.dat", "Anodyne/src/data/CSV_Data_STREET_FG.dat"],
+    "tileset": "data/TileData__Street_Tiles.png",
+    "layers": ["data/CSV_Data_STREET_BG.dat", "data/CSV_Data_STREET_BG2.dat", "data/CSV_Data_STREET_FG.dat"],
     "physics": " ############################                                                   ",
   },
   {
     "map_name": "SUBURB",
-    "tileset": "Anodyne/src/data/TileData_Suburb_Tiles.png",
-    "layers": ["Anodyne/src/data/CSV_Data_SUBURB_BG.dat"],
+    "tileset": "data/TileData_Suburb_Tiles.png",
+    "layers": ["data/CSV_Data_SUBURB_BG.dat"],
     "physics": " #########################################################################################                                                                                ",
   },
   {
     "map_name": "TERMINAL",
-    "tileset": "Anodyne/src/data/TileData_Terminal_Tiles.png",
-    "layers": ["Anodyne/src/data/CSV_Data_TERMINAL_BG.dat", "Anodyne/src/data/CSV_Data_TERMINAL_BG2.dat"],
+    "tileset": "data/TileData_Terminal_Tiles.png",
+    "layers": ["data/CSV_Data_TERMINAL_BG.dat", "data/CSV_Data_TERMINAL_BG2.dat"],
     "physics": " ####################h#######################################hhhh#######################################################   ###hh########   #######   #  ",
   },
   {
     "map_name": "WINDMILL",
-    "tileset": "Anodyne/src/data/TileData__Windmill_Tiles.png",
-    "layers": ["Anodyne/src/data/CSV_Data_WINDMILL_BG.dat", "Anodyne/src/data/CSV_Data_WINDMILL_BG2.dat"],
+    "tileset": "data/TileData__Windmill_Tiles.png",
+    "layers": ["data/CSV_Data_WINDMILL_BG.dat", "data/CSV_Data_WINDMILL_BG2.dat"],
     "physics": " ###################################################################################################          ll                                      ",
   }
 ]
@@ -309,161 +321,161 @@ physics_tileset = None
 physics_tileset_char_codes = " #l,<^>vwhs&12345678"
 
 sprite_paths = {
-  "Slime": "Anodyne/src/entity/enemy/bedroom/Slime_Slime_Sprite.png",
-  "SinglePushBlock": "Anodyne/src/entity/gadget/SinglePushBlock_C_PUSH_BLOCKS.png",
+  "Slime": "entity/enemy/bedroom/Slime_Slime_Sprite.png",
+  "SinglePushBlock": "entity/gadget/SinglePushBlock_C_PUSH_BLOCKS.png",
   "Door": [
-    "Anodyne/src/entity/gadget/Door_embed_nexus_cardgem.png",
-    "Anodyne/src/entity/gadget/Door_Nexus_door_overlay_embed.png",
-    "Anodyne/src/entity/gadget/Door_Sprite_nexus_door.png",
-    "Anodyne/src/entity/gadget/Door_Door_Sprites.png",
+    "entity/gadget/Door_embed_nexus_cardgem.png",
+    "entity/gadget/Door_Nexus_door_overlay_embed.png",
+    "entity/gadget/Door_Sprite_nexus_door.png",
+    "entity/gadget/Door_Door_Sprites.png",
   ],
   "Wall_Laser": "???",
-  "Eye_Light": "Anodyne/src/entity/decoration/Eye_Light_Eye_Light_Sprite.png",
-  "Mover": "Anodyne/src/entity/enemy/redcave/Mover_mover_sprite.png",
-  "KeyBlock": "Anodyne/src/entity/gadget/KeyBlock_C_KEYBLOCK_SPRITE.png",
-  "Hole": "Anodyne/src/entity/gadget/Hole_C_HOLE_SPRITE.png",
-  "Gate": "Anodyne/src/entity/gadget/Gate_C_GATE_SPRITES.png",
-  "Treasure": "Anodyne/src/entity/gadget/Treasure_S_TREASURE_SPRITE.png",
-  "CrackedTile": "Anodyne/src/entity/gadget/CrackedTile_C_CRACKED_TILES.png",
-  "Button": "Anodyne/src/entity/gadget/Button_S_BUTTON.png",
-  "Sun_Guy": "Anodyne/src/entity/enemy/bedroom/Sun_Guy_C_SUN_GUY.png",
-  "Dust": "Anodyne/src/entity/gadget/Dust_DUST_SPRITE.png",
-  "Shieldy": "Anodyne/src/entity/enemy/bedroom/Shieldy_SPRITE_SHIELDY.png",
-  "Pew_Laser": "Anodyne/src/entity/enemy/bedroom/Pew_Laser_PEW_LASER.png",
-  "Annoyer": "Anodyne/src/entity/enemy/bedroom/Annoyer_S_ANNOYER_SPRITE.png",
-  "Console": "Anodyne/src/entity/gadget/Console_sprite_console.png",
-  "Follower_Bro": "Anodyne/src/entity/enemy/etc/Follower_Bro_sprite_follower.png",
-  "Sadbro": "Anodyne/src/entity/enemy/etc/Sadbro_sadman_sprite.png",
-  "Red_Walker": "Anodyne/src/entity/enemy/etc/Red_Walker_sprite_redwalker.png",
-  "Four_Shooter": "Anodyne/src/entity/enemy/redcave/Four_Shooter_four_shooter_sprite.png",
-  "Slasher": "Anodyne/src/entity/enemy/redcave/Slasher_slasher_sprite.png",
-  "On_Off_Laser": "Anodyne/src/entity/enemy/redcave/On_Off_Laser_on_off_shooter_sprite.png",
-  "Red_Pillar": "Anodyne/src/entity/interactive/Red_Pillar_red_pillar_sprite.png",
+  "Eye_Light": "entity/decoration/Eye_Light_Eye_Light_Sprite.png",
+  "Mover": "entity/enemy/redcave/Mover_mover_sprite.png",
+  "KeyBlock": "entity/gadget/KeyBlock_C_KEYBLOCK_SPRITE.png",
+  "Hole": "entity/gadget/Hole_C_HOLE_SPRITE.png",
+  "Gate": "entity/gadget/Gate_C_GATE_SPRITES.png",
+  "Treasure": "entity/gadget/Treasure_S_TREASURE_SPRITE.png",
+  "CrackedTile": "entity/gadget/CrackedTile_C_CRACKED_TILES.png",
+  "Button": "entity/gadget/Button_S_BUTTON.png",
+  "Sun_Guy": "entity/enemy/bedroom/Sun_Guy_C_SUN_GUY.png",
+  "Dust": "entity/gadget/Dust_DUST_SPRITE.png",
+  "Shieldy": "entity/enemy/bedroom/Shieldy_SPRITE_SHIELDY.png",
+  "Pew_Laser": "entity/enemy/bedroom/Pew_Laser_PEW_LASER.png",
+  "Annoyer": "entity/enemy/bedroom/Annoyer_S_ANNOYER_SPRITE.png",
+  "Console": "entity/gadget/Console_sprite_console.png",
+  "Follower_Bro": "entity/enemy/etc/Follower_Bro_sprite_follower.png",
+  "Sadbro": "entity/enemy/etc/Sadbro_sadman_sprite.png",
+  "Red_Walker": "entity/enemy/etc/Red_Walker_sprite_redwalker.png",
+  "Four_Shooter": "entity/enemy/redcave/Four_Shooter_four_shooter_sprite.png",
+  "Slasher": "entity/enemy/redcave/Slasher_slasher_sprite.png",
+  "On_Off_Laser": "entity/enemy/redcave/On_Off_Laser_on_off_shooter_sprite.png",
+  "Red_Pillar": "entity/interactive/Red_Pillar_red_pillar_sprite.png",
   "Solid_Sprite": [
-    "Anodyne/src/entity/decoration/Solid_Sprite_red_cave_left_sprite.png",
-    "Anodyne/src/entity/decoration/Solid_Sprite_trees_sprites.png",
+    "entity/decoration/Solid_Sprite_red_cave_left_sprite.png",
+    "entity/decoration/Solid_Sprite_trees_sprites.png",
   ],
-  "Big_Door": "Anodyne/src/entity/gadget/Big_Door_big_door_sprite.png",
+  "Big_Door": "entity/gadget/Big_Door_big_door_sprite.png",
   "Fisherman": "???",
-  "Jump_Trigger": "Anodyne/src/entity/gadget/Jump_Trigger_spring_pad_sprite.png",
+  "Jump_Trigger": "entity/gadget/Jump_Trigger_spring_pad_sprite.png",
   "NPC": [
-    "Anodyne/src/entity/interactive/NPC_key_sparkle_embed.png",
-    "Anodyne/src/entity/interactive/NPC_embed_trade_npcs.png",
-    "Anodyne/src/entity/interactive/NPC_embed_cube_kings.png",
-    "Anodyne/src/entity/interactive/NPC_embed_cell_bodies.png",
-    "Anodyne/src/entity/interactive/NPC_embed_geoms.png",
-    "Anodyne/src/entity/interactive/NPC_embed_nexus_pad.png",
-    "Anodyne/src/entity/interactive/NPC_embed_windmill_blade.png",
-    "Anodyne/src/entity/interactive/NPC_embed_randoms.png",
-    "Anodyne/src/entity/interactive/NPC_note_rock.png",
-    "Anodyne/src/entity/interactive/NPC_npc_spritesheet.png",
+    "entity/interactive/NPC_key_sparkle_embed.png",
+    "entity/interactive/NPC_embed_trade_npcs.png",
+    "entity/interactive/NPC_embed_cube_kings.png",
+    "entity/interactive/NPC_embed_cell_bodies.png",
+    "entity/interactive/NPC_embed_geoms.png",
+    "entity/interactive/NPC_embed_nexus_pad.png",
+    "entity/interactive/NPC_embed_windmill_blade.png",
+    "entity/interactive/NPC_embed_randoms.png",
+    "entity/interactive/NPC_note_rock.png",
+    "entity/interactive/NPC_npc_spritesheet.png",
   ],
-  "Red_Boss": "Anodyne/src/entity/enemy/redcave/Red_Boss_red_boss_sprite.png",
-  "Propelled": "Anodyne/src/entity/gadget/Propelled_moving_platform_sprite.png",
+  "Red_Boss": "entity/enemy/redcave/Red_Boss_red_boss_sprite.png",
+  "Propelled": "entity/gadget/Propelled_moving_platform_sprite.png",
   "Stop_Marker": "???",
-  "Person": "Anodyne/src/entity/enemy/crowd/Person_person_sprite.png",
-  "Rotator": "Anodyne/src/entity/enemy/crowd/Rotator_rotator_sprite.png",
-  "Frog": "Anodyne/src/entity/enemy/crowd/Frog_frog_sprite.png",
-  "Dog": "Anodyne/src/entity/enemy/crowd/Dog_dog_sprite.png",
+  "Person": "entity/enemy/crowd/Person_person_sprite.png",
+  "Rotator": "entity/enemy/crowd/Rotator_rotator_sprite.png",
+  "Frog": "entity/enemy/crowd/Frog_frog_sprite.png",
+  "Dog": "entity/enemy/crowd/Dog_dog_sprite.png",
   "WallBoss": [
-    "Anodyne/src/entity/enemy/crowd/WallBoss_wall_sprite.png",
-    "Anodyne/src/entity/enemy/crowd/WallBoss_bullet_sprite.png",
-    "Anodyne/src/entity/enemy/crowd/WallBoss_l_hand_sprite.png",
-    "Anodyne/src/entity/enemy/crowd/WallBoss_r_hand_sprite.png",
-    "Anodyne/src/entity/enemy/crowd/WallBoss_face_sprite.png",
-    "Anodyne/src/entity/enemy/crowd/WallBoss_laser_sprite.png",
+    "entity/enemy/crowd/WallBoss_wall_sprite.png",
+    "entity/enemy/crowd/WallBoss_bullet_sprite.png",
+    "entity/enemy/crowd/WallBoss_l_hand_sprite.png",
+    "entity/enemy/crowd/WallBoss_r_hand_sprite.png",
+    "entity/enemy/crowd/WallBoss_face_sprite.png",
+    "entity/enemy/crowd/WallBoss_laser_sprite.png",
   ],
-  "Pillar_Switch": "Anodyne/src/entity/gadget/Pillar_Switch_pillar_switch_sprite.png",
-  "Switch_Pillar": "Anodyne/src/entity/gadget/Switch_Pillar_switch_pillar_sprite.png",
-  "Silverfish": "Anodyne/src/entity/enemy/apartment/Silverfish_silverfish_sprite.png",
-  "Rat": "Anodyne/src/entity/enemy/apartment/Rat_rat_sprite.png",
-  "Teleguy": "Anodyne/src/entity/enemy/apartment/Teleguy_teleguy_sprite.png",
-  "Dash_Trap": "Anodyne/src/entity/enemy/apartment/Dash_Trap_dash_trap_sprite.png",
-  "Gasguy": "Anodyne/src/entity/enemy/apartment/Gasguy_gas_guy_sprite.png",
+  "Pillar_Switch": "entity/gadget/Pillar_Switch_pillar_switch_sprite.png",
+  "Switch_Pillar": "entity/gadget/Switch_Pillar_switch_pillar_sprite.png",
+  "Silverfish": "entity/enemy/apartment/Silverfish_silverfish_sprite.png",
+  "Rat": "entity/enemy/apartment/Rat_rat_sprite.png",
+  "Teleguy": "entity/enemy/apartment/Teleguy_teleguy_sprite.png",
+  "Dash_Trap": "entity/enemy/apartment/Dash_Trap_dash_trap_sprite.png",
+  "Gasguy": "entity/enemy/apartment/Gasguy_gas_guy_sprite.png",
   "Terminal_Gate": "???",
-  "Dustmaid": "Anodyne/src/entity/enemy/hotel/Dustmaid_dustmaid_sprite.png",
-  "Splitboss": "Anodyne/src/entity/enemy/apartment/Splitboss_splitboss_sprite.png",
+  "Dustmaid": "entity/enemy/hotel/Dustmaid_dustmaid_sprite.png",
+  "Splitboss": "entity/enemy/apartment/Splitboss_splitboss_sprite.png",
   "Nonsolid": [
-    "Anodyne/src/entity/decoration/Nonsolid_grass_REDSEA_sprite.png",
-    "Anodyne/src/entity/decoration/Nonsolid_rail_sprite.png",
-    "Anodyne/src/entity/decoration/Nonsolid_rail_CROWD_sprite.png",
-    "Anodyne/src/entity/decoration/Nonsolid_rail_NEXUS_sprite.png",
-    "Anodyne/src/entity/decoration/Nonsolid_grass_1_sprite.png",
+    "entity/decoration/Nonsolid_grass_REDSEA_sprite.png",
+    "entity/decoration/Nonsolid_rail_sprite.png",
+    "entity/decoration/Nonsolid_rail_CROWD_sprite.png",
+    "entity/decoration/Nonsolid_rail_NEXUS_sprite.png",
+    "entity/decoration/Nonsolid_grass_1_sprite.png",
   ],
-  "Steam_Pipe": "Anodyne/src/entity/enemy/hotel/Steam_Pipe_steam_pipe_sprite.png",
-  "Burst_Plant": "Anodyne/src/entity/enemy/hotel/Burst_Plant_burst_plant_sprite.png",
-  "Dash_Pad": "Anodyne/src/entity/gadget/Dash_Pad_dash_pad_sprite.png",
-  "Elevator": "Anodyne/src/entity/interactive/Elevator_Elevator_Sprite.png",
-  "Eye_Boss": "Anodyne/src/entity/enemy/hotel/Eye_Boss_eye_boss_water_sprite.png",
+  "Steam_Pipe": "entity/enemy/hotel/Steam_Pipe_steam_pipe_sprite.png",
+  "Burst_Plant": "entity/enemy/hotel/Burst_Plant_burst_plant_sprite.png",
+  "Dash_Pad": "entity/gadget/Dash_Pad_dash_pad_sprite.png",
+  "Elevator": "entity/interactive/Elevator_Elevator_Sprite.png",
+  "Eye_Boss": "entity/enemy/hotel/Eye_Boss_eye_boss_water_sprite.png",
   "HealthPickup": [
-    "Anodyne/src/entity/player/HealthPickup_embed_Big_health.png",
-    "Anodyne/src/entity/player/HealthPickup_S_SMALL_HEALTH.png",
+    "entity/player/HealthPickup_embed_Big_health.png",
+    "entity/player/HealthPickup_S_SMALL_HEALTH.png",
   ],
-  "Contort": "Anodyne/src/entity/enemy/circus/Contort_contort_big_sprite.png",
-  "Lion": "Anodyne/src/entity/enemy/circus/Lion_lion_sprite.png",
-  "Fire_Pillar": "Anodyne/src/entity/enemy/circus/Fire_Pillar_fire_pillar_base_sprite.png",
-  "Sage": "Anodyne/src/entity/interactive/npc/Sage_sage_sprite.png",
-  "Mitra": "Anodyne/src/entity/interactive/npc/Mitra_mitra_sprite.png",
-  "Health_Cicada": "Anodyne/src/entity/interactive/Health_Cicada_health_cicada_embed.png",
-  "Dungeon_Statue": "Anodyne/src/entity/interactive/Dungeon_Statue_statue_bedroom_embed.png",
-  "Chaser": "Anodyne/src/entity/enemy/etc/Chaser_embed_chaser_sprite.png",
+  "Contort": "entity/enemy/circus/Contort_contort_big_sprite.png",
+  "Lion": "entity/enemy/circus/Lion_lion_sprite.png",
+  "Fire_Pillar": "entity/enemy/circus/Fire_Pillar_fire_pillar_base_sprite.png",
+  "Sage": "entity/interactive/npc/Sage_sage_sprite.png",
+  "Mitra": "entity/interactive/npc/Mitra_mitra_sprite.png",
+  "Health_Cicada": "entity/interactive/Health_Cicada_health_cicada_embed.png",
+  "Dungeon_Statue": "entity/interactive/Dungeon_Statue_statue_bedroom_embed.png",
+  "Chaser": "entity/enemy/etc/Chaser_embed_chaser_sprite.png",
   "Space_Face": "???",
   "Go_Detector": "???",
-  "Sage_Boss": "Anodyne/src/entity/enemy/etc/Sage_Boss_embed_sage_boss.png",
-  "Shadow_Briar": "Anodyne/src/entity/interactive/npc/Shadow_Briar_embed_briar.png",
-  "Trade_NPC": "Anodyne/src/entity/interactive/npc/Trade_NPC_embed_dame_trade_npc.png",
-  "Forest_NPC": "Anodyne/src/entity/interactive/npc/Forest_NPC_embed_forest_npcs.png",
-  "Redsea_NPC": "Anodyne/src/entity/interactive/npc/Redsea_NPC_embed_redsea_npcs.png",
-  "Happy_NPC": "Anodyne/src/entity/interactive/npc/Happy_NPC_embed_happy_npcs.png",
-  "Space_NPC": "Anodyne/src/entity/interactive/npc/Space_NPC_embed_space_npc.png",
-  "Huge_Fucking_Stag": "Anodyne/src/entity/interactive/npc/Huge_Fucking_Stag_embed_stag.png",
+  "Sage_Boss": "entity/enemy/etc/Sage_Boss_embed_sage_boss.png",
+  "Shadow_Briar": "entity/interactive/npc/Shadow_Briar_embed_briar.png",
+  "Trade_NPC": "entity/interactive/npc/Trade_NPC_embed_dame_trade_npc.png",
+  "Forest_NPC": "entity/interactive/npc/Forest_NPC_embed_forest_npcs.png",
+  "Redsea_NPC": "entity/interactive/npc/Redsea_NPC_embed_redsea_npcs.png",
+  "Happy_NPC": "entity/interactive/npc/Happy_NPC_embed_happy_npcs.png",
+  "Space_NPC": "entity/interactive/npc/Space_NPC_embed_space_npc.png",
+  "Huge_Fucking_Stag": "entity/interactive/npc/Huge_Fucking_Stag_embed_stag.png",
   "Black_Thing": "???",
-  "Suburb_Walker": "Anodyne/src/entity/enemy/suburb/Suburb_Walker_embed_suburb_folk.png",
-  "Suburb_Killer": "Anodyne/src/entity/enemy/suburb/Suburb_Walker_embed_suburb_killer.png",
-  "Key": "Anodyne/src/entity/gadget/Key_C_KEY_SPRITE.png",
+  "Suburb_Walker": "entity/enemy/suburb/Suburb_Walker_embed_suburb_folk.png",
+  "Suburb_Killer": "entity/enemy/suburb/Suburb_Walker_embed_suburb_killer.png",
+  "Key": "entity/gadget/Key_C_KEY_SPRITE.png",
 }
 sprites = {}
 def load_sprites():
   for sprite_name in sprite_paths:
     if type(sprite_paths[sprite_name]) == str and sprite_paths[sprite_name] != "???":
       sprites[sprite_name] = read_tileset(sprite_paths[sprite_name])
-  sprites["nonsolid_rail_sprite"] = read_tileset("Anodyne/src/entity/decoration/Nonsolid_rail_sprite.png")
-  sprites["nonsolid_rail_crowd"] = read_tileset("Anodyne/src/entity/decoration/Nonsolid_rail_CROWD_sprite.png")
-  sprites["npc_cell_bodies"] = read_tileset("Anodyne/src/entity/interactive/NPC_embed_cell_bodies.png")
-  sprites["npc_rock"] = read_tileset("Anodyne/src/entity/interactive/NPC_note_rock.png")
-  sprites["door_portal"] = read_tileset("Anodyne/src/entity/gadget/Door_White_Portal_Sprite.png")
-  sprites["nexus_pad"] = read_tileset("Anodyne/src/entity/interactive/NPC_embed_nexus_pad.png")
-  sprites["beach_npcs"] = read_tileset("Anodyne/src/entity/interactive/NPC_embed_beach_npcs.png")
-  sprites["whirlpool"] = read_tileset("Anodyne/src/entity/gadget/Door_Whirlpool_Door_Sprite.png")
-  sprites["npc_sage_statue"] = read_tileset("Anodyne/src/entity/interactive/NPC_sage_statue.png")
-  sprites["big_key"] = read_tileset("Anodyne/src/entity/interactive/NPC_key_green_embed.png")
-  sprites["windmill_console"] = read_tileset("Anodyne/src/entity/gadget/Console_embed_windmill_inside.png")
-  sprites["windmill_shell"] = read_tileset("Anodyne/src/entity/interactive/NPC_embed_windmill_shell.png")
-  sprites["big_gate"] = read_tileset("Anodyne/src/entity/gadget/KeyBlock_green_gate_embed.png")
-  sprites["checkpoint"] = read_tileset("Anodyne/src/entity/gadget/Checkpoint_checkpoint_sprite.png")
-  sprites["Spike_Roller_V"] = read_tileset("Anodyne/src/entity/enemy/crowd/Spike_Roller_Spike_Roller_Sprite.png")
-  sprites["Spike_Roller_H"] = read_tileset("Anodyne/src/entity/enemy/crowd/Spike_Roller_Spike_Roller_Sprite_H.png")
-  sprites["Spike_Roller_V_S"] = read_tileset("Anodyne/src/entity/enemy/crowd/Spike_Roller_vert_shadow_sprite.png", fade=True)
-  sprites["Spike_Roller_H_S"] = read_tileset("Anodyne/src/entity/enemy/crowd/Spike_Roller_hori_shadow_sprite.png", fade=True)
-  sprites["npc_snowman"] = read_tileset("Anodyne/src/entity/interactive/NPC_embed_blue_npcs.png")
-  sprites["circus_folks_arthur"] = read_tileset("Anodyne/src/entity/enemy/circus/Circus_Folks_arthur_sprite.png")
-  sprites["circus_folks_javiera"] = read_tileset("Anodyne/src/entity/enemy/circus/Circus_Folks_javiera_sprite.png")
-  sprites["circus_folks_both"] = read_tileset("Anodyne/src/entity/enemy/circus/Circus_Folks_both_sprite.png")
-  sprites["npc_golem"] = read_tileset("Anodyne/src/entity/interactive/NPC_embed_cliff_npcs.png")
-  sprites["biofilm"] = read_tileset("Anodyne/src/entity/interactive/NPC_npc_biofilm.png")
-  sprites["wall_boss_wall"] = read_tileset("Anodyne/src/entity/enemy/crowd/WallBoss_wall_sprite.png")
-  sprites["wall_boss_mouth"] = read_tileset("Anodyne/src/entity/enemy/crowd/WallBoss_face_sprite.png")
-  sprites["wall_boss_hand"] = read_tileset("Anodyne/src/entity/enemy/crowd/WallBoss_l_hand_sprite.png")
-  sprites["npc_hotel"] = read_tileset("Anodyne/src/entity/interactive/NPC_embed_hotel_npcs.png")
-  sprites["bike"] = read_tileset("Anodyne/src/entity/interactive/npc/Mitra_bike_sprite.png")
-  sprites["mitra_on_bike"] = read_tileset("Anodyne/src/entity/interactive/npc/Mitra_mitra_on_bike_sprite.png")
-  sprites["smoke_red"] = read_tileset("Anodyne/src/entity/interactive/NPC_embed_smoke_red.png")
-  sprites["red_cave"] = read_tileset("Anodyne/src/entity/decoration/Solid_Sprite_red_cave_left_sprite.png")
-  sprites["ground_thorn"] = read_tileset("Anodyne/src/entity/enemy/etc/Briar_Boss_embed_ground_thorn.png")
-  sprites["npc_squiggles"] = read_tileset("Anodyne/src/entity/interactive/NPC_npc_spritesheet.png")
-  sprites["debug_tree"] = read_tileset("Anodyne/src/entity/decoration/Solid_Sprite_trees_sprites.png")
-  sprites["npc_devs"] = read_tileset("Anodyne/src/states/EndingState_embed_dev_npcs.png")
-  sprites["nexus_doors"] = read_tileset("Anodyne/src/entity/gadget/Door_Nexus_door_previews_embed.png")
+  sprites["nonsolid_rail_sprite"] = read_tileset("entity/decoration/Nonsolid_rail_sprite.png")
+  sprites["nonsolid_rail_crowd"] = read_tileset("entity/decoration/Nonsolid_rail_CROWD_sprite.png")
+  sprites["npc_cell_bodies"] = read_tileset("entity/interactive/NPC_embed_cell_bodies.png")
+  sprites["npc_rock"] = read_tileset("entity/interactive/NPC_note_rock.png")
+  sprites["door_portal"] = read_tileset("entity/gadget/Door_White_Portal_Sprite.png")
+  sprites["nexus_pad"] = read_tileset("entity/interactive/NPC_embed_nexus_pad.png")
+  sprites["beach_npcs"] = read_tileset("entity/interactive/NPC_embed_beach_npcs.png")
+  sprites["whirlpool"] = read_tileset("entity/gadget/Door_Whirlpool_Door_Sprite.png")
+  sprites["npc_sage_statue"] = read_tileset("entity/interactive/NPC_sage_statue.png")
+  sprites["big_key"] = read_tileset("entity/interactive/NPC_key_green_embed.png")
+  sprites["windmill_console"] = read_tileset("entity/gadget/Console_embed_windmill_inside.png")
+  sprites["windmill_shell"] = read_tileset("entity/interactive/NPC_embed_windmill_shell.png")
+  sprites["big_gate"] = read_tileset("entity/gadget/KeyBlock_green_gate_embed.png")
+  sprites["checkpoint"] = read_tileset("entity/gadget/Checkpoint_checkpoint_sprite.png")
+  sprites["Spike_Roller_V"] = read_tileset("entity/enemy/crowd/Spike_Roller_Spike_Roller_Sprite.png")
+  sprites["Spike_Roller_H"] = read_tileset("entity/enemy/crowd/Spike_Roller_Spike_Roller_Sprite_H.png")
+  sprites["Spike_Roller_V_S"] = read_tileset("entity/enemy/crowd/Spike_Roller_vert_shadow_sprite.png", fade=True)
+  sprites["Spike_Roller_H_S"] = read_tileset("entity/enemy/crowd/Spike_Roller_hori_shadow_sprite.png", fade=True)
+  sprites["npc_snowman"] = read_tileset("entity/interactive/NPC_embed_blue_npcs.png")
+  sprites["circus_folks_arthur"] = read_tileset("entity/enemy/circus/Circus_Folks_arthur_sprite.png")
+  sprites["circus_folks_javiera"] = read_tileset("entity/enemy/circus/Circus_Folks_javiera_sprite.png")
+  sprites["circus_folks_both"] = read_tileset("entity/enemy/circus/Circus_Folks_both_sprite.png")
+  sprites["npc_golem"] = read_tileset("entity/interactive/NPC_embed_cliff_npcs.png")
+  sprites["biofilm"] = read_tileset("entity/interactive/NPC_npc_biofilm.png")
+  sprites["wall_boss_wall"] = read_tileset("entity/enemy/crowd/WallBoss_wall_sprite.png")
+  sprites["wall_boss_mouth"] = read_tileset("entity/enemy/crowd/WallBoss_face_sprite.png")
+  sprites["wall_boss_hand"] = read_tileset("entity/enemy/crowd/WallBoss_r_hand_sprite.png")
+  sprites["npc_hotel"] = read_tileset("entity/interactive/NPC_embed_hotel_npcs.png")
+  sprites["bike"] = read_tileset("entity/interactive/npc/Mitra_bike_sprite.png")
+  sprites["mitra_on_bike"] = read_tileset("entity/interactive/npc/Mitra_mitra_on_bike_sprite.png")
+  sprites["smoke_red"] = read_tileset("entity/interactive/NPC_embed_smoke_red.png")
+  sprites["red_cave"] = read_tileset("entity/decoration/Solid_Sprite_red_cave_left_sprite.png")
+  sprites["ground_thorn"] = read_tileset("entity/enemy/etc/Briar_Boss_embed_ground_thorn.png")
+  sprites["npc_squiggles"] = read_tileset("entity/interactive/NPC_npc_spritesheet.png")
+  sprites["debug_tree"] = read_tileset("entity/decoration/Solid_Sprite_trees_sprites.png")
+  sprites["npc_devs"] = read_tileset("states/EndingState_embed_dev_npcs.png")
+  sprites["nexus_doors"] = read_tileset("entity/gadget/Door_Nexus_door_previews_embed.png")
   global physics_tileset
   physics_tileset = read_tileset(physics_tileset_path)
   global grid_overlay
@@ -1244,12 +1256,16 @@ def main():
   parser.add_argument("-f", "--force", action="store_true")
   parser.add_argument("-p", "--physics", action="store_true")
   parser.add_argument("-g", "--grid", action="store_true")
+  parser.add_argument("--source", default="Anodyne/src")
   args = parser.parse_args()
 
   valid_map_names = set(mapfile["map_name"] for mapfile in mapfiles)
   for map_name in args.map_name:
     if map_name not in valid_map_names:
       parser.error("unknown map name: {}\nvalid choices: {}".format(map_name, " ".join(valid_map_names)))
+
+  global src_root
+  src_root = args.source
 
   # read registry XML file that contains entity information
   objects_by_map_name = read_registry()
