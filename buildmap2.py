@@ -8,7 +8,6 @@
 #
 # Anodyne game: http://www.anodynegame.com/
 #
-# The source folder should be in ./Anodyne/src/
 # The map images will be outputted to ./maps/ in PNG format.
 #
 
@@ -482,12 +481,35 @@ def load_sprites():
   grid_overlay = read_tileset("grid_overlay.png")
   global grid_overlay_solid
   grid_overlay_solid = read_tileset("grid_overlay_solid.png")
+  global blocker_sprite
+  blocker_sprite = read_tileset("blocker_sprite.png")
+  global vblock_sprite
+  vblock_sprite = read_tileset("vblock_sprite.png")
+
+def render_physics_entities(image, entities, map_name):
+  did_anything = False
+  for entity in entities:
+    entity_name = entity["name"]
+    x = entity["x"]
+    y = entity["y"]
+    sprite = None
+    if x < 0 or y < 0:
+      print("WARNING: ignoring out of bounds entity: {}, {}".format(x, y))
+      continue
+    if entity_name == "Solid_Sprite":
+      solid_sprite_type = entity["type"]
+      if solid_sprite_type == "blocker":
+        sprite = blocker_sprite
+      elif solid_sprite_type == "vblock":
+        sprite = vblock_sprite
+
+    if sprite != None:
+      image.paste(sprite, dx=x, dy=y)
+      did_anything = True
+  return did_anything
 
 warning_set = set()
-def render_entities(image, entities, map_name, physics_only=False):
-  if physics_only:
-    # TODO: handle entity physics
-    return False
+def render_entities(image, entities, map_name):
   did_anything = False
 
   # get all the Dust first, since it can go away to fule a Propelled
@@ -1276,7 +1298,11 @@ def main():
     layers = generate_map_image(mapfile, physics_only=args.physics)
     # draw the supported entities on the maps
     entity_layer = simplepng.ImageBuffer(layers[0].width, layers[0].height)
-    if render_entities(entity_layer, objects_by_map_name[map_name], map_name, physics_only=args.physics):
+    if args.physics:
+      render_function = render_physics_entities
+    else:
+      render_function = render_entities
+    if render_function(entity_layer, objects_by_map_name[map_name], map_name):
       layers[2] = entity_layer
 
     # apply grayscale effect to SUBURB
