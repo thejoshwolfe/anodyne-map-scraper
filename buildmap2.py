@@ -1,15 +1,5 @@
 #!/usr/bin/python3
-#
-# www.josephlandry.com
-#
-# buildmap.py
-#
-# Builds map images from Anodyne game source files.
-#
-# Anodyne game: http://www.anodynegame.com/
-#
-# The map images will be outputted to ./maps/ in PNG format.
-#
+"""Builds map images from Anodyne game source files."""
 
 import os
 import sys
@@ -1262,7 +1252,7 @@ def main():
   parser.add_argument("-f", "--force", action="store_true")
   parser.add_argument("-p", "--physics", action="store_true")
   parser.add_argument("-g", "--grid", action="store_true")
-  parser.add_argument("--source", default="Anodyne/src")
+  parser.add_argument("--source", default="Anodyne_1.509")
   args = parser.parse_args()
 
   valid_map_names = set(mapfile["map_name"] for mapfile in mapfiles)
