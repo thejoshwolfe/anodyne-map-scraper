@@ -14,7 +14,7 @@ Prerequisites:
 * Purchase Anodyne
 * Some skill at using the command line
 * Python 3
-* ffdec.exe - a flash decompiler
+* ffdec.exe - a flash decompiler - tested with version 9.0.0
 * Tested on Linux and Windows+Cygwin
 
 When you purchase Anodyne, you will get a file called `Anodyne.swf` somewhere.
@@ -36,6 +36,8 @@ Now you can build the maps:
 ```
 python3 buildmap2.py
 ```
+
+The default output location is `maps/`.
 
 Try running either of the above `.py` scripts with `--help` for more detailed options
 such as adding grid lines or rendering only the physics instead of the appearance.

@@ -19,7 +19,9 @@ def main():
   if args.force or not os.path.isdir(tmp_dir):
     if os.path.isdir(tmp_dir):
       shutil.rmtree(tmp_dir)
-    subprocess.check_call(["progress", args.ffdec, "-export", "all", tmp_dir, args.swf])
+    cmd = [args.ffdec, "-export", "all", tmp_dir, args.swf]
+    print(repr(cmd))
+    subprocess.check_call(cmd)
 
   if args.force and os.path.exists(args.output):
     shutil.rmtree(args.output)
