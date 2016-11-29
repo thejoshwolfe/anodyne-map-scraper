@@ -4,10 +4,11 @@
 import os
 import sys
 import csv
-import simplepng
 from collections import defaultdict
 import itertools
 from xml import sax
+sys.path.append(os.path.join(os.path.dirname(__file__), "simplepng.py"))
+import simplepng
 
 def find_and_open(filename, mode):
   try: return open(filename, mode)
