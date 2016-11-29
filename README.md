@@ -31,6 +31,16 @@ From this project's directory:
 python3 extract_swf.py PATH/TO/ffdec.exe PATH/TO/Anodyne.swf
 ```
 
+Make sure you got the submodules updated. With git, do this:
+
+```
+git submodule init
+git submodule update
+```
+
+Without git, you can just download [simplepng.py](https://raw.githubusercontent.com/thejoshwolfe/simplepng.py/master/simplepng.py)
+and put it in this directory at `simplepng.py/simplepng.py`.
+
 Now you can build the maps:
 
 ```
